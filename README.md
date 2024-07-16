@@ -1,6 +1,6 @@
 <p align="center">
 	<p align="center">
-		<img src="imgs/icon.png" width="256" height="256" alt="intro screen" />
+		<img src="AIPop/Assets.xcassets/AppIcon.appiconset/icon_256x256.png" width="256" height="256" alt="intro screen" />
 	</p>
 	<h1 align="center">AIPop</h1>
 	<h4 align="center">Lightning-Fast ChatGPT/Claude launcher for macOS</h4>

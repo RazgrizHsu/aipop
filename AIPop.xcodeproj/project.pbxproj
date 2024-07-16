@@ -18,7 +18,6 @@
 		753BCB3A2BB8C1A4006CBC64 /* @Settings.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5C5F0242B8EDCAB00903601 /* @Settings.swift */; };
 		753BCB3B2BB8C1A4006CBC64 /* @Defaults.swift in Sources */ = {isa = PBXBuildFile; fileRef = C53410792B8F3B0E007C55EA /* @Defaults.swift */; };
 		753BCB3E2BB8C1AB006CBC64 /* fw.swift in Sources */ = {isa = PBXBuildFile; fileRef = 753BCB2E2BB8C067006CBC64 /* fw.swift */; };
-		755533A32BB8C4F200482285 /* imgs in Resources */ = {isa = PBXBuildFile; fileRef = 755533A22BB8C4F200482285 /* imgs */; };
 		75C4EC142BFED3D50045394B /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = C5091C802B5C4D8B0091896F /* Assets.xcassets */; };
 		75C4EC162BFED6660045394B /* Base.swift in Sources */ = {isa = PBXBuildFile; fileRef = 75C4EC152BFED6660045394B /* Base.swift */; };
 		75DE712D2C048D390095F0D0 /* winPop.swift in Sources */ = {isa = PBXBuildFile; fileRef = 75DE712C2C048D390095F0D0 /* winPop.swift */; };
@@ -31,7 +30,6 @@
 		753BCB232BB8BE01006CBC64 /* SettingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingView.swift; sourceTree = "<group>"; };
 		753BCB2E2BB8C067006CBC64 /* fw.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = fw.swift; sourceTree = "<group>"; };
 		753BCB302BB8C0EA006CBC64 /* AIPop.entitlements */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.entitlements; path = AIPop.entitlements; sourceTree = "<group>"; };
-		755533A22BB8C4F200482285 /* imgs */ = {isa = PBXFileReference; lastKnownFileType = folder; path = imgs; sourceTree = "<group>"; };
 		75C4EC152BFED6660045394B /* Base.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Base.swift; sourceTree = "<group>"; };
 		75DE712C2C048D390095F0D0 /* winPop.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = winPop.swift; sourceTree = "<group>"; };
 		75F2242A2C028F3800D714C9 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -85,7 +83,6 @@
 			isa = PBXGroup;
 			children = (
 				75F2242A2C028F3800D714C9 /* Info.plist */,
-				755533A22BB8C4F200482285 /* imgs */,
 				C5091C7B2B5C4D8A0091896F /* AIPop */,
 				C57241E82B67CF5900703101 /* AIPopTests */,
 				C5091C7A2B5C4D8A0091896F /* Products */,
@@ -245,7 +242,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				75C4EC142BFED3D50045394B /* Assets.xcassets in Resources */,
-				755533A32BB8C4F200482285 /* imgs in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -295,7 +291,7 @@
 				CODE_SIGN_ENTITLEMENTS = AIPop/AIPop.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 19;
+				CURRENT_PROJECT_VERSION = 22;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_ASSET_PATHS = "";
 				DEVELOPMENT_TEAM = KT5ZZ9Q8DJ;
@@ -303,6 +299,7 @@
 				ENABLE_PREVIEWS = YES;
 				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				INFOPLIST_FILE = Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = AIPop;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.utilities";
 				INFOPLIST_KEY_LSUIElement = YES;
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
@@ -329,7 +326,7 @@
 				CODE_SIGN_ENTITLEMENTS = AIPop/AIPop.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 19;
+				CURRENT_PROJECT_VERSION = 22;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_ASSET_PATHS = "";
 				DEVELOPMENT_TEAM = KT5ZZ9Q8DJ;
@@ -337,6 +334,7 @@
 				ENABLE_PREVIEWS = YES;
 				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				INFOPLIST_FILE = Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = AIPop;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.utilities";
 				INFOPLIST_KEY_LSUIElement = YES;
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";

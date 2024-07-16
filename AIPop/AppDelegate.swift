@@ -61,7 +61,8 @@ class MenuBarController
 			btn.sendAction(on: [.leftMouseUp, .rightMouseUp]) // 設置對左鍵和右鍵單擊的響應
 			btn.target = self
 			
-			if let img = NSImage(contentsOfFile: Bundle.main.path(forResource: "icon", ofType: "png", inDirectory: "imgs")!) {
+			if let img = NSImage( named: NSImage.Name( "AppIcon" ) )
+			{
 				img.size = NSSize(width: 20, height: 20)
 				btn.image = img
 			}
