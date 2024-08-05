@@ -133,7 +133,7 @@ class MBC
 	
 	@MainActor @objc func clicked_Reload() { wpop?.reloadWebView() }
 	
-	@MainActor @objc func clicked_ResetPosition() { wpop?.resetPositions() }
+	@MainActor @objc func clicked_ResetPosition() { wpop?.resetPositions(true) }
 	
 	@MainActor @objc func clicked_Clear()
 	{

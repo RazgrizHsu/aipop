@@ -38,7 +38,7 @@ struct iApp: App
 	
 	//@StateObject private var appState = AppState()
 	
-	static let initSize = NSSize(width: 675, height: 730)
+	static let initSize = NSSize(width: 980, height: 860)
 	
 	var body: some Scene
 	{
