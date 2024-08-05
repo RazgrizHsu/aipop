@@ -56,7 +56,7 @@ struct iApp: App
 //	
 //	deinit
 //	{
-//		print( "release!" )
+//		log( "release!" )
 //	}
 //}
 

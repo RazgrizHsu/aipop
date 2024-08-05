@@ -41,19 +41,23 @@ struct SettingView: View
 					Menu {
 						Button {
 							toHost = "chatgpt.com"
-							MenuBarController.shared.clicked_Reload()
-							//if let ad = NSApplication.shared.delegate as? AppDelegate { MenuBarController.shared.clicked_Reload() }
-							
+							MBC.shared.clicked_Reload()
 						} label: {
 							Text("ChatGPT.com")
 							Image(systemName: "arrow.down.right.circle")
 						}
 						Button {
 							toHost = "claude.ai"
-							MenuBarController.shared.clicked_Reload()
-							//if let ad = NSApplication.shared.delegate as? AppDelegate { ad.mbc.clicked_Reload() }
+							MBC.shared.clicked_Reload()
 						} label: {
 							Text("Claude.AI")
+							Image(systemName: "arrow.up.and.down.circle")
+						}
+						Button {
+							toHost = "gemini.google.com"
+							MBC.shared.clicked_Reload()
+						} label: {
+							Text("Gemini")
 							Image(systemName: "arrow.up.and.down.circle")
 						}
 					} label: {

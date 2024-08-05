@@ -1,11 +1,14 @@
 import Defaults
 import Foundation
 
+private let fixNSRectBridge = NSRect.zero
+
 extension Defaults.Keys
 {
 	static let host = Key<String>( "host", default: "chatgpt.com" )
+	static let dicPopFrame = Key<[Double: NSRect]>( "dicPopFrame", default: [:] )
 	
-	static let popFrame = Key<NSRect>( "popFrame", default: fixNSRectBridge )
+	//static let bak = Key<NSRect>( "bak", default: fixNSRectBridge )
 }
 
 
@@ -38,5 +41,3 @@ public final class DefaultsNSRectBridge: Defaults.Bridge
 		return NSRect(x: x, y: y, width: w, height: h)
 	}
 }
-
-private let fixNSRectBridge = NSRect.zero

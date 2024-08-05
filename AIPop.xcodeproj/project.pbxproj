@@ -20,6 +20,8 @@
 		753BCB3E2BB8C1AB006CBC64 /* fw.swift in Sources */ = {isa = PBXBuildFile; fileRef = 753BCB2E2BB8C067006CBC64 /* fw.swift */; };
 		75C4EC142BFED3D50045394B /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = C5091C802B5C4D8B0091896F /* Assets.xcassets */; };
 		75C4EC162BFED6660045394B /* Base.swift in Sources */ = {isa = PBXBuildFile; fileRef = 75C4EC152BFED6660045394B /* Base.swift */; };
+		75D334C12C6002420074C2A3 /* windows.swift in Sources */ = {isa = PBXBuildFile; fileRef = 75D334C02C6002420074C2A3 /* windows.swift */; };
+		75D334C32C6004E20074C2A3 /* SiteBtnsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 75D334C22C6004E20074C2A3 /* SiteBtnsView.swift */; };
 		75DE712D2C048D390095F0D0 /* winPop.swift in Sources */ = {isa = PBXBuildFile; fileRef = 75DE712C2C048D390095F0D0 /* winPop.swift */; };
 		C57241EA2B67CF5900703101 /* AIPopTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C57241E92B67CF5900703101 /* AIPopTests.swift */; };
 /* End PBXBuildFile section */
@@ -31,6 +33,8 @@
 		753BCB2E2BB8C067006CBC64 /* fw.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = fw.swift; sourceTree = "<group>"; };
 		753BCB302BB8C0EA006CBC64 /* AIPop.entitlements */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.entitlements; path = AIPop.entitlements; sourceTree = "<group>"; };
 		75C4EC152BFED6660045394B /* Base.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Base.swift; sourceTree = "<group>"; };
+		75D334C02C6002420074C2A3 /* windows.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = windows.swift; sourceTree = "<group>"; };
+		75D334C22C6004E20074C2A3 /* SiteBtnsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SiteBtnsView.swift; sourceTree = "<group>"; };
 		75DE712C2C048D390095F0D0 /* winPop.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = winPop.swift; sourceTree = "<group>"; };
 		75F2242A2C028F3800D714C9 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		C5091C7C2B5C4D8A0091896F /* App.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = App.swift; sourceTree = "<group>"; };
@@ -110,6 +114,7 @@
 				C57800932B7C7BF900B40EEC /* AppDelegate.swift */,
 				C5091C802B5C4D8B0091896F /* Assets.xcassets */,
 				753BCB302BB8C0EA006CBC64 /* AIPop.entitlements */,
+				75D334C02C6002420074C2A3 /* windows.swift */,
 			);
 			path = AIPop;
 			sourceTree = "<group>";
@@ -125,6 +130,7 @@
 		C57800922B7C7BBC00B40EEC /* Views */ = {
 			isa = PBXGroup;
 			children = (
+				75D334C22C6004E20074C2A3 /* SiteBtnsView.swift */,
 				753BCB232BB8BE01006CBC64 /* SettingView.swift */,
 			);
 			path = Views;
@@ -267,6 +273,8 @@
 				750473A82C0F174700317CA9 /* VC.swift in Sources */,
 				753BCB322BB8C196006CBC64 /* AppDelegate.swift in Sources */,
 				75DE712D2C048D390095F0D0 /* winPop.swift in Sources */,
+				75D334C12C6002420074C2A3 /* windows.swift in Sources */,
+				75D334C32C6004E20074C2A3 /* SiteBtnsView.swift in Sources */,
 				753BCB252BB8BE15006CBC64 /* SettingView.swift in Sources */,
 				753BCB312BB8C193006CBC64 /* App.swift in Sources */,
 			);
@@ -291,7 +299,7 @@
 				CODE_SIGN_ENTITLEMENTS = AIPop/AIPop.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 22;
+				CURRENT_PROJECT_VERSION = 28;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_ASSET_PATHS = "";
 				DEVELOPMENT_TEAM = KT5ZZ9Q8DJ;
@@ -309,7 +317,7 @@
 					"@executable_path/../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 13.0;
-				MARKETING_VERSION = 1.1.0;
+				MARKETING_VERSION = 1.2.0;
 				PRODUCT_BUNDLE_IDENTIFIER = tw.raz.mac.AIPop;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
@@ -326,7 +334,7 @@
 				CODE_SIGN_ENTITLEMENTS = AIPop/AIPop.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 22;
+				CURRENT_PROJECT_VERSION = 28;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_ASSET_PATHS = "";
 				DEVELOPMENT_TEAM = KT5ZZ9Q8DJ;
@@ -344,7 +352,7 @@
 					"@executable_path/../Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 13.0;
-				MARKETING_VERSION = 1.1.0;
+				MARKETING_VERSION = 1.2.0;
 				PRODUCT_BUNDLE_IDENTIFIER = tw.raz.mac.AIPop;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
