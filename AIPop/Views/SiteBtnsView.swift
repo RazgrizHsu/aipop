@@ -11,12 +11,12 @@ struct styleBtn: ButtonStyle {
 	let inactiveColor: Color = .gray
 	let startPoint: UnitPoint = .bottom
 	let endPoint: UnitPoint = .topTrailing
-	let cornerRadius: CGFloat = 8
-	let shadowRadius: CGFloat = 3
+	let cornerRadius: CGFloat = 3
+	let shadowRadius: CGFloat = 2
 	let shadowColor: Color = .white
-	let inactiveOpacity: Double = 0.7
+	let inactiveOpacity: Double = 0.75
 	
-	static let defPad: [CGFloat] = [ 6, 10, 6, 10 ]
+	static let defPad: [CGFloat] = [ 3, 6, 3, 6 ]
 
 	init(av: Bool, padding: [CGFloat] = defPad) {
 		self.av = av
@@ -59,7 +59,7 @@ struct SiteBtnsView: View {
 						toHost = "chatgpt.com"
 						MBC.shared.clicked_Reload()
 					})
-					{ Text("ChatGPT") }
+					{ Text("ChatGPT").font(.system(size: 11)) }
 					.buttonStyle(styleBtn(av: toHost == "chatgpt.com"))
 					.disabled(toHost == "host1")
 
@@ -67,7 +67,7 @@ struct SiteBtnsView: View {
 						toHost = "claude.ai"
 						MBC.shared.clicked_Reload()
 					})
-					{ Text("Claude") }
+					{ Text("Claude").font(.system(size: 11)) }
 					.buttonStyle(styleBtn(av: toHost == "claude.ai"))
 					.disabled(toHost == "claude.ai")
 
@@ -75,7 +75,7 @@ struct SiteBtnsView: View {
 						toHost = "gemini.google.com"
 						MBC.shared.clicked_Reload()
 					})
-					{ Text("Gemini") }
+					{ Text("Gemini").font(.system(size: 11)) }
 					.buttonStyle(styleBtn(av: toHost == "gemini.google.com"))
 					.disabled(toHost == "gemini.google.com")
 				}

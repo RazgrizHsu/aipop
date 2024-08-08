@@ -276,11 +276,8 @@ class winPop: NSWindow, NSWindowDelegate
 		self.setFrameOrigin( po )
 	}
 	
-	
-	override func setFrameOrigin(_ point: NSPoint) {
-		super.setFrameOrigin( point )
-		
-		log( "[wpop:setFrameOrigin] \(point) monx[\(MBC.shared.monX)]" )
+	func resetRefPos()
+	{
 		let fr = self.frame
 		
 		var dic = Defaults[.dicPopFrame]
@@ -292,12 +289,17 @@ class winPop: NSWindow, NSWindowDelegate
 		}
 	}
 	
-	func windowWillResize(_ sender: NSWindow, to news: NSSize) -> NSSize
+	override func setFrameOrigin(_ point: NSPoint)
 	{
-		log( "[wpop:reisze] \(news)" )
-		let fm = sender.frame
-		if fm.maxY < winPop.last.maxY {}
-		return news
+		super.setFrameOrigin( point )
+		
+		//log( "[wpop:setFrameOrigin] \(point) monx[\(MBC.shared.monX)]" )
+		resetRefPos()
+		saveNowPos()
+	}
+	override func setContentSize(_ size: NSSize) {
+		super.setContentSize(size)
+		log( "[wpop:setContentSize] \(size)" )
 	}
 	
 	private var lastMonX: Double = 0.0
@@ -306,11 +308,21 @@ class winPop: NSWindow, NSWindowDelegate
 		get { return lastMonX != MBC.shared.monX }
 	}
 	
+	func saveNowPos()
+	{
+		guard let btn = MBC.shared.statusItem?.button else { return }
+		guard let btnFm = btn.window?.convertToScreen( btn.frame ) else { return }
+		let monX = btnFm.origin.x + (btnFm.width / 2)
+		var dic = Defaults[.dicPopFrame]
+		
+		dic[monX] = self.frame
+		Defaults[.dicPopFrame] = dic
+	}
+	
 	func resetPositions( _ isReset: Bool = false )
 	{
 		guard let btn = MBC.shared.statusItem?.button else { return }
 		guard let btnFm = btn.window?.convertToScreen( btn.frame ) else { return }
-		
 		
 		
 		let isFirst = winPop.last == NSRect.zero
@@ -334,6 +346,7 @@ class winPop: NSWindow, NSWindowDelegate
 			
 			if let ofm = dic[monX] {
 				
+				log( "[wpop] pos: ofm: \( ofm )" )
 				self.setFrameOrigin( ofm.origin )
 				if( ofm.size.width > 100 && ofm.size.height > 100 ) { self.setContentSize( ofm.size ) }
 				else {
@@ -345,6 +358,7 @@ class winPop: NSWindow, NSWindowDelegate
 			else {
 				
 				let npt = NSPoint(x: monX - ( po.width / 2), y: ( btnFm.origin.y - po.height ) - 25 )
+				log( "[wpop] pos: npt: \( npt )" )
 				self.setFrameOrigin(npt)
 				self.setContentSize( iApp.initSize )
 				
@@ -382,5 +396,20 @@ class winPop: NSWindow, NSWindowDelegate
 		}
 
 		super.keyDown(with: event)
+	}
+	
+	
+	
+	
+	func windowWillResize(_ sender: NSWindow, to news: NSSize) -> NSSize
+	{
+		log( "[wpop:reisze] \(news)" )
+		
+		self.resetRefPos()
+		self.saveNowPos()
+		
+		let fm = sender.frame
+		if fm.maxY < winPop.last.maxY {}
+		return news
 	}
 }

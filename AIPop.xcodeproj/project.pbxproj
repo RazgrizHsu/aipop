@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		750473A82C0F174700317CA9 /* VC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 750473A72C0F174600317CA9 /* VC.swift */; };
+		75306AD92C64F56600B45D77 /* Notifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = 75306AD82C64F56600B45D77 /* Notifier.swift */; };
 		753BCB252BB8BE15006CBC64 /* SettingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 753BCB232BB8BE01006CBC64 /* SettingView.swift */; };
 		753BCB282BB8BEA1006CBC64 /* Settings in Frameworks */ = {isa = PBXBuildFile; productRef = 753BCB272BB8BEA1006CBC64 /* Settings */; };
 		753BCB2A2BB8BEA1006CBC64 /* KeyboardShortcuts in Frameworks */ = {isa = PBXBuildFile; productRef = 753BCB292BB8BEA1006CBC64 /* KeyboardShortcuts */; };
@@ -28,6 +29,7 @@
 
 /* Begin PBXFileReference section */
 		750473A72C0F174600317CA9 /* VC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VC.swift; sourceTree = "<group>"; };
+		75306AD82C64F56600B45D77 /* Notifier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Notifier.swift; sourceTree = "<group>"; };
 		753BCB142BB8BD6F006CBC64 /* AIPop.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = AIPop.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		753BCB232BB8BE01006CBC64 /* SettingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingView.swift; sourceTree = "<group>"; };
 		753BCB2E2BB8C067006CBC64 /* fw.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = fw.swift; sourceTree = "<group>"; };
@@ -115,6 +117,7 @@
 				C5091C802B5C4D8B0091896F /* Assets.xcassets */,
 				753BCB302BB8C0EA006CBC64 /* AIPop.entitlements */,
 				75D334C02C6002420074C2A3 /* windows.swift */,
+				75306AD82C64F56600B45D77 /* Notifier.swift */,
 			);
 			path = AIPop;
 			sourceTree = "<group>";
@@ -269,6 +272,7 @@
 				753BCB352BB8C1A4006CBC64 /* Functions.swift in Sources */,
 				75C4EC162BFED6660045394B /* Base.swift in Sources */,
 				753BCB3A2BB8C1A4006CBC64 /* @Settings.swift in Sources */,
+				75306AD92C64F56600B45D77 /* Notifier.swift in Sources */,
 				753BCB3B2BB8C1A4006CBC64 /* @Defaults.swift in Sources */,
 				750473A82C0F174700317CA9 /* VC.swift in Sources */,
 				753BCB322BB8C196006CBC64 /* AppDelegate.swift in Sources */,
@@ -299,7 +303,7 @@
 				CODE_SIGN_ENTITLEMENTS = AIPop/AIPop.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 29;
+				CURRENT_PROJECT_VERSION = 31;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_ASSET_PATHS = "";
 				DEVELOPMENT_TEAM = KT5ZZ9Q8DJ;
@@ -334,7 +338,7 @@
 				CODE_SIGN_ENTITLEMENTS = AIPop/AIPop.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 29;
+				CURRENT_PROJECT_VERSION = 31;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_ASSET_PATHS = "";
 				DEVELOPMENT_TEAM = KT5ZZ9Q8DJ;

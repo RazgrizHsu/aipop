@@ -173,6 +173,7 @@ class MBC
 				warr?.orderFront(nil)
 				pop.makeKeyAndOrderFront(nil)
 			}
+			pop.resetRefPos()
 		}
 		else
 		{
@@ -183,13 +184,13 @@ class MBC
 				warr = winImage( "arrow.up.circle.fill" )
 				
 				wmov = winImage( "arrow.up.and.down.and.arrow.left.and.right", wpop )
-				wmov?.offset = NSPoint( x: 15, y: -3.8 )
+				wmov?.offset = NSPoint( x: 12, y: -3.8 )
 				wmov?.level = .popUpMenu
 				wmov?.parent = wpop
 				wmov?.title = "mov"
 				
 				wbtn = winBtns( )
-				wbtn?.offset = NSPoint( x: 50, y: -18 )
+				wbtn?.offset = NSPoint( x: 39, y: -12 )
 				wbtn?.level = .popUpMenu
 				wbtn?.parent = wpop
 				wbtn?.title = "btns"
@@ -201,13 +202,11 @@ class MBC
 			guard let pop = wpop else { return }
 			
 			pop.resetPositions()
+			pop.resetRefPos()
 			
 			NSApp.activate(ignoringOtherApps: true)
 			
 			warr?.orderFront(nil)
-			//wmov?.orderFront(nil)
-			//wbtn?.orderFront(nil)
-			
 			wmov?.makeKeyAndOrderFront(nil)
 			wbtn?.makeKeyAndOrderFront(nil)
 			
