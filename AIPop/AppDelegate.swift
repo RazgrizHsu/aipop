@@ -161,7 +161,7 @@ class MBC
 		{
 			if pop.isKeyWindow
 			{
-				winPop.last = pop.frame
+				pop.resetPositions()
 				warr?.orderOut(nil)
 				pop.orderOut(nil)
 			}

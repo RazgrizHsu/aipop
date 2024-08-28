@@ -19,6 +19,7 @@
 		753BCB3A2BB8C1A4006CBC64 /* @Settings.swift in Sources */ = {isa = PBXBuildFile; fileRef = C5C5F0242B8EDCAB00903601 /* @Settings.swift */; };
 		753BCB3B2BB8C1A4006CBC64 /* @Defaults.swift in Sources */ = {isa = PBXBuildFile; fileRef = C53410792B8F3B0E007C55EA /* @Defaults.swift */; };
 		753BCB3E2BB8C1AB006CBC64 /* fw.swift in Sources */ = {isa = PBXBuildFile; fileRef = 753BCB2E2BB8C067006CBC64 /* fw.swift */; };
+		75454C362C7FB5FD000B9D96 /* code.swift in Sources */ = {isa = PBXBuildFile; fileRef = 75454C352C7FB5FD000B9D96 /* code.swift */; };
 		75C4EC142BFED3D50045394B /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = C5091C802B5C4D8B0091896F /* Assets.xcassets */; };
 		75C4EC162BFED6660045394B /* Base.swift in Sources */ = {isa = PBXBuildFile; fileRef = 75C4EC152BFED6660045394B /* Base.swift */; };
 		75D334C12C6002420074C2A3 /* windows.swift in Sources */ = {isa = PBXBuildFile; fileRef = 75D334C02C6002420074C2A3 /* windows.swift */; };
@@ -34,6 +35,7 @@
 		753BCB232BB8BE01006CBC64 /* SettingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingView.swift; sourceTree = "<group>"; };
 		753BCB2E2BB8C067006CBC64 /* fw.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = fw.swift; sourceTree = "<group>"; };
 		753BCB302BB8C0EA006CBC64 /* AIPop.entitlements */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.entitlements; path = AIPop.entitlements; sourceTree = "<group>"; };
+		75454C352C7FB5FD000B9D96 /* code.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = code.swift; sourceTree = "<group>"; };
 		75C4EC152BFED6660045394B /* Base.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Base.swift; sourceTree = "<group>"; };
 		75D334C02C6002420074C2A3 /* windows.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = windows.swift; sourceTree = "<group>"; };
 		75D334C22C6004E20074C2A3 /* SiteBtnsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SiteBtnsView.swift; sourceTree = "<group>"; };
@@ -155,6 +157,7 @@
 			isa = PBXGroup;
 			children = (
 				C5A5BC992B626EEC00104D06 /* Functions.swift */,
+				75454C352C7FB5FD000B9D96 /* code.swift */,
 			);
 			path = Helpers;
 			sourceTree = "<group>";
@@ -276,6 +279,7 @@
 				753BCB3B2BB8C1A4006CBC64 /* @Defaults.swift in Sources */,
 				750473A82C0F174700317CA9 /* VC.swift in Sources */,
 				753BCB322BB8C196006CBC64 /* AppDelegate.swift in Sources */,
+				75454C362C7FB5FD000B9D96 /* code.swift in Sources */,
 				75DE712D2C048D390095F0D0 /* winPop.swift in Sources */,
 				75D334C12C6002420074C2A3 /* windows.swift in Sources */,
 				75D334C32C6004E20074C2A3 /* SiteBtnsView.swift in Sources */,
@@ -303,7 +307,7 @@
 				CODE_SIGN_ENTITLEMENTS = AIPop/AIPop.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 31;
+				CURRENT_PROJECT_VERSION = 32;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_ASSET_PATHS = "";
 				DEVELOPMENT_TEAM = KT5ZZ9Q8DJ;
@@ -338,7 +342,7 @@
 				CODE_SIGN_ENTITLEMENTS = AIPop/AIPop.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 31;
+				CURRENT_PROJECT_VERSION = 32;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_ASSET_PATHS = "";
 				DEVELOPMENT_TEAM = KT5ZZ9Q8DJ;

@@ -196,8 +196,6 @@ class winPop: NSWindow, NSWindowDelegate
 	
 	var wins: [baseWin] = []
 	
-	static var last: NSRect = NSRect.zero
-	
 	convenience init()
 	{
 		self.init(contentRect: .zero, styleMask: [.titled, .closable, .miniaturizable, .resizable, .fullSizeContentView], backing: .buffered, defer: false)
@@ -293,13 +291,14 @@ class winPop: NSWindow, NSWindowDelegate
 	{
 		super.setFrameOrigin( point )
 		
-		//log( "[wpop:setFrameOrigin] \(point) monx[\(MBC.shared.monX)]" )
+		log( "[wpop:setFrameOrigin] \(point) monx[\(MBC.shared.monX)]" )
 		resetRefPos()
 		saveNowPos()
 	}
 	override func setContentSize(_ size: NSSize) {
 		super.setContentSize(size)
 		log( "[wpop:setContentSize] \(size)" )
+		saveNowPos()
 	}
 	
 	private var lastMonX: Double = 0.0
@@ -308,16 +307,22 @@ class winPop: NSWindow, NSWindowDelegate
 		get { return lastMonX != MBC.shared.monX }
 	}
 	
+	let debSavePos = Debouncer( delay: 0.3 )
 	func saveNowPos()
 	{
-		guard let btn = MBC.shared.statusItem?.button else { return }
-		guard let btnFm = btn.window?.convertToScreen( btn.frame ) else { return }
-		let monX = btnFm.origin.x + (btnFm.width / 2)
-		var dic = Defaults[.dicPopFrame]
-		
-		dic[monX] = self.frame
-		Defaults[.dicPopFrame] = dic
+		debSavePos.debounce {
+			guard let btn = MBC.shared.statusItem?.button else { return }
+			guard let btnFm = btn.window?.convertToScreen( btn.frame ) else { return }
+			let monX = btnFm.origin.x + (btnFm.width / 2)
+			
+			var dic = Defaults[.dicPopFrame]
+			
+			log( "[wpop] save: monX[\(monX)] new: \( self.frame )" )
+			dic[monX] = self.frame
+			Defaults[.dicPopFrame] = dic
+		}
 	}
+	
 	
 	func resetPositions( _ isReset: Bool = false )
 	{
@@ -325,7 +330,7 @@ class winPop: NSWindow, NSWindowDelegate
 		guard let btnFm = btn.window?.convertToScreen( btn.frame ) else { return }
 		
 		
-		let isFirst = winPop.last == NSRect.zero
+		//let isFirst = winPop.last == NSRect.zero
 		
 		let po = self.frame
 		let monX = btnFm.origin.x + (btnFm.width / 2)
@@ -338,33 +343,39 @@ class winPop: NSWindow, NSWindowDelegate
 		}
 		
 		let isMonCh = lastMonX != monX
-		if( isReset || isFirst || isMonCh )
-		{
-			lastMonX = monX
-			log( "[wpop] isReset[ \(isReset) ] isFirst[ \(isFirst) ] isMonCh[ \(isMonCh) ]" )
+
+		lastMonX = monX
+		
+		let npt = NSPoint(x: monX - ( po.width / 2), y: ( btnFm.origin.y - po.height ) - 25 )
+		
+		log( "[wpop] monX[\(monX)] isReset[ \(isReset) ] isMonCh[ \(isMonCh) ] npt: \(npt)" )
+		
+		if var ofm = dic[monX] {
 			
+			if( ofm.origin.y > npt.y ) { ofm.origin.y = npt.y }
 			
-			if let ofm = dic[monX] {
-				
-				log( "[wpop] pos: ofm: \( ofm )" )
+			log( "[wpop] pos: exist ofm: \( ofm )" )
+			if( ofm.size.width > 100 && ofm.size.height > 100 ) {
+				self.setContentSize( ofm.size )
 				self.setFrameOrigin( ofm.origin )
-				if( ofm.size.width > 100 && ofm.size.height > 100 ) { self.setContentSize( ofm.size ) }
-				else {
-					self.setContentSize( iApp.initSize )
-					dic[monX] = self.frame
-					Defaults[.dicPopFrame] = dic
-				}
 			}
 			else {
-				
-				let npt = NSPoint(x: monX - ( po.width / 2), y: ( btnFm.origin.y - po.height ) - 25 )
-				log( "[wpop] pos: npt: \( npt )" )
-				self.setFrameOrigin(npt)
+				log( "[wpop] set new by iApp[\(iApp.initSize)]" )
 				self.setContentSize( iApp.initSize )
+				self.setFrameOrigin( ofm.origin )
 				
 				dic[monX] = self.frame
 				Defaults[.dicPopFrame] = dic
 			}
+		}
+		else {
+			
+			log( "[wpop] pos: new npt: \( npt )" )
+			self.setFrameOrigin( npt )
+			self.setContentSize( iApp.initSize )
+			
+			dic[monX] = self.frame
+			Defaults[.dicPopFrame] = dic
 		}
 	
 		
@@ -408,8 +419,8 @@ class winPop: NSWindow, NSWindowDelegate
 		self.resetRefPos()
 		self.saveNowPos()
 		
-		let fm = sender.frame
-		if fm.maxY < winPop.last.maxY {}
+		//let fm = sender.frame
+		//if fm.maxY < winPop.last.maxY {}
 		return news
 	}
 }
