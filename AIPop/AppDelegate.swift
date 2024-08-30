@@ -58,13 +58,16 @@ class MBC
 	var statusItem: NSStatusItem?
 	var menu = NSMenu()
 	
-	var monX : Double
+	public static var monId : Int
 	{
 		get
 		{
-			guard let btn = MBC.shared.statusItem?.button else { return 0.0 }
-			guard let btnFm = btn.window?.convertToScreen( btn.frame ) else { return 0.0 }
-			return btnFm.origin.x + (btnFm.width / 2)
+			guard let scr = NSScreen.main,
+				  let idx = NSScreen.screens.firstIndex(of: scr) else {
+				return 0
+			}
+			
+			return idx
 		}
 	}
 

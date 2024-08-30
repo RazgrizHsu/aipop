@@ -6,7 +6,7 @@ private let fixNSRectBridge = NSRect.zero
 extension Defaults.Keys
 {
 	static let host = Key<String>( "host", default: "chatgpt.com" )
-	static let dicPopFrame = Key<[Double: NSRect]>( "dicPopFrame", default: [:] )
+	static let dicPopFrame = Key<[Int: NSRect]>( "dicPopFrame", default: [:] )
 	
 	//static let bak = Key<NSRect>( "bak", default: fixNSRectBridge )
 }

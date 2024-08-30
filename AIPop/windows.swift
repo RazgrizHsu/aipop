@@ -279,7 +279,7 @@ class winPop: NSWindow, NSWindowDelegate
 		let fr = self.frame
 		
 		var dic = Defaults[.dicPopFrame]
-		dic[MBC.shared.monX] = fr
+		dic[MBC.monId] = fr
 		Defaults[.dicPopFrame] = dic
 		
 		for win in wins {
@@ -291,7 +291,7 @@ class winPop: NSWindow, NSWindowDelegate
 	{
 		super.setFrameOrigin( point )
 		
-		log( "[wpop:setFrameOrigin] \(point) monx[\(MBC.shared.monX)]" )
+		log( "[wpop:setFrameOrigin] \(point) monx[\(MBC.monId)]" )
 		resetRefPos()
 		saveNowPos()
 	}
@@ -301,20 +301,16 @@ class winPop: NSWindow, NSWindowDelegate
 		saveNowPos()
 	}
 	
-	private var lastMonX: Double = 0.0
-	var isMonChange : Bool
-	{
-		get { return lastMonX != MBC.shared.monX }
-	}
+	
+	private var lastMonId: Int = 0
+	var isMonChange : Bool { get { return lastMonId != MBC.monId } }
 	
 	let debSavePos = Debouncer( delay: 0.3 )
 	func saveNowPos()
 	{
 		debSavePos.debounce {
-			guard let btn = MBC.shared.statusItem?.button else { return }
-			guard let btnFm = btn.window?.convertToScreen( btn.frame ) else { return }
-			let monX = btnFm.origin.x + (btnFm.width / 2)
 			
+			let monX = MBC.monId
 			var dic = Defaults[.dicPopFrame]
 			
 			log( "[wpop] save: monX[\(monX)] new: \( self.frame )" )
@@ -333,8 +329,7 @@ class winPop: NSWindow, NSWindowDelegate
 		//let isFirst = winPop.last == NSRect.zero
 		
 		let po = self.frame
-		let monX = btnFm.origin.x + (btnFm.width / 2)
-		if( lastMonX == 0 ) { lastMonX = monX }
+		
 		
 		var dic = Defaults[.dicPopFrame]
 		if isReset {
@@ -342,15 +337,16 @@ class winPop: NSWindow, NSWindowDelegate
 			Defaults[.dicPopFrame] = dic
 		}
 		
-		let isMonCh = lastMonX != monX
+		let isMonCh = lastMonId != MBC.monId
 
-		lastMonX = monX
+		lastMonId = MBC.monId
 		
+		let monX = btnFm.origin.x + (btnFm.width / 2)
 		let npt = NSPoint(x: monX - ( po.width / 2), y: ( btnFm.origin.y - po.height ) - 25 )
 		
-		log( "[wpop] monX[\(monX)] isReset[ \(isReset) ] isMonCh[ \(isMonCh) ] npt: \(npt)" )
+		log( "[wpop] monId[\(lastMonId)] isReset[ \(isReset) ] isMonCh[ \(isMonCh) ] npt: \(npt)" )
 		
-		if var ofm = dic[monX] {
+		if var ofm = dic[lastMonId] {
 			
 			if( ofm.origin.y > npt.y ) { ofm.origin.y = npt.y }
 			
@@ -364,7 +360,7 @@ class winPop: NSWindow, NSWindowDelegate
 				self.setContentSize( iApp.initSize )
 				self.setFrameOrigin( ofm.origin )
 				
-				dic[monX] = self.frame
+				dic[lastMonId] = self.frame
 				Defaults[.dicPopFrame] = dic
 			}
 		}
@@ -374,7 +370,7 @@ class winPop: NSWindow, NSWindowDelegate
 			self.setFrameOrigin( npt )
 			self.setContentSize( iApp.initSize )
 			
-			dic[monX] = self.frame
+			dic[MBC.monId] = self.frame
 			Defaults[.dicPopFrame] = dic
 		}
 	
