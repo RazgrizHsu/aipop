@@ -49,35 +49,26 @@ struct styleBtn: ButtonStyle {
 }
 
 struct SiteBtnsView: View {
-	@Default(.host) private var toHost
+	@Default(.nowHost) private var selected
 
 	var body: some View {
 		Form {
 			VStack {
 				HStack {
-					Button(action: {
-						toHost = "chatgpt.com"
-						MBC.shared.clicked_Reload()
-					})
-					{ Text("ChatGPT").font(.system(size: 11)) }
-					.buttonStyle(styleBtn(av: toHost == "chatgpt.com"))
-					.disabled(toHost == "host1")
-
-					Button(action: {
-						toHost = "claude.ai"
-						MBC.shared.clicked_Reload()
-					})
-					{ Text("Claude").font(.system(size: 11)) }
-					.buttonStyle(styleBtn(av: toHost == "claude.ai"))
-					.disabled(toHost == "claude.ai")
-
-					Button(action: {
-						toHost = "gemini.google.com"
-						MBC.shared.clicked_Reload()
-					})
-					{ Text("Gemini").font(.system(size: 11)) }
-					.buttonStyle(styleBtn(av: toHost == "gemini.google.com"))
-					.disabled(toHost == "gemini.google.com")
+					
+					ForEach( Defaults[.aiServices], id: \.host )
+					{ svc in
+						Button(action: {
+							selected = svc.host
+							MBC.shared.clicked_Reload()
+						})
+						{
+							Text( svc.name ).font(.system(size: 11))
+						}
+						.buttonStyle(styleBtn(av: selected == svc.host ))
+						.disabled(selected == svc.host)
+					}
+					
 				}
 			}
 		}

@@ -10,7 +10,7 @@ import KeyboardShortcuts
 
 struct SettingView: View
 {
-	@Default(.host) private var toHost
+	@Default(.nowHost) private var selected
 	
 	var body: some View 
 	{
@@ -36,36 +36,22 @@ struct SettingView: View
 							.stroke(Color.gray, lineWidth: 2)
 					)
 				
-				LabeledContent("Target")
-				{
+				LabeledContent("Target") {
 					Menu {
-						Button {
-							toHost = "chatgpt.com"
-							MBC.shared.clicked_Reload()
-						} label: {
-							Text("ChatGPT.com")
-							Image(systemName: "arrow.down.right.circle")
-						}
-						Button {
-							toHost = "claude.ai"
-							MBC.shared.clicked_Reload()
-						} label: {
-							Text("Claude.AI")
-							Image(systemName: "arrow.up.and.down.circle")
-						}
-						Button {
-							toHost = "gemini.google.com"
-							MBC.shared.clicked_Reload()
-						} label: {
-							Text("Gemini")
-							Image(systemName: "arrow.up.and.down.circle")
+						ForEach(Defaults[.aiServices], id: \.host) { svc in
+							Button {
+								selected = svc.host
+								MBC.shared.clicked_Reload()
+							} label: {
+								Text(svc.name)
+								Image(systemName: svc.ico)
+							}
 						}
 					} label: {
-						Text( toHost.isEmpty ? "select.." : toHost )
-						 Image(systemName: "tag.circle" )
+						Text(selected.isEmpty ? "select.." : selected)
+						Image(systemName: "tag.circle")
 					}
-					.frame( width:240 )
-					
+					.frame(width: 240)
 				}
 				.frame(width: 300)
 				.padding(5)

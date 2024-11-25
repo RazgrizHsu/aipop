@@ -249,7 +249,7 @@ class winPop: NSWindow, NSWindowDelegate
 			webView.trailingAnchor.constraint(equalTo: self.contentView!.trailingAnchor)
 		])
 		
-		webView.load(URLRequest(url: URL(string: "https://\( Defaults[.host] )")!))
+		webView.load(URLRequest(url: URL(string: "https://\( Defaults[.nowHost] )")!))
 	}
 	
 	func windowDidBecomeKey(_ notification: Notification)
