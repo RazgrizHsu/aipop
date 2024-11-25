@@ -32,9 +32,9 @@
 
 <p align="center"><img src="intro.ch.jpg" alt="ChatGPT" /></p>
 
-<p align="center"><img src="intro.ge.png" alt="Gemini" /></p>
+<p align="center"><img src="intro.ge.jpg" alt="Gemini" /></p>
 
-<p align="center"><img src="intro.pe.png" alt="Perplexity" /></p>
+<p align="center"><img src="intro.pe.jpg" alt="Perplexity" /></p>
 
 > [!NOTE]
 >
