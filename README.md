@@ -3,15 +3,15 @@
 		<img src="AIPop/Assets.xcassets/AppIcon.appiconset/icon_256x256.png" width="256" height="256" alt="intro screen" />
 	</p>
 	<h1 align="center">AIPop</h1>
-	<h4 align="center">Lightning-Fast ChatGPT/Claude/Gemini launcher for macOS</h4>
+	<h4 align="center">Lightning-Fast Claude/ChatGPT/Perplexity/Gemini launcher for macOS</h4>
 </p>
 
 
 
 ## Features
 
-- [x] Quickly popup the ChatGPT / Claude / Gemini window without searching through many apps.
-    > 可快速彈出 ChatGPT / Claude / Gemini AI對話視窗，無需在許多程式中尋找
+- [x] Quickly popup the `Claude` / `ChatGPT` / `Perplexity` / `Gemini` window without searching through many apps.
+    > 可快速彈出 `Claude` / `ChatGPT` / `Perplexity` / `Gemini` 對話視窗，無需在許多程式中尋找
 
 - [x] Floating buttons, quickly switch between different AIs.
     > 浮動的透明按鈕，讓你快速在不同AI間切換
@@ -27,20 +27,14 @@
 
 
 
-## Screenshot for chatgpt
-<p align="center">
-	<img src="intro1.png" alt="intro screen" />
-</p>
+## Screenshots
+<p align="center"><img src="intro.cl.jpg" alt="claude.ai" /></p>
 
-## Screenshot for Claude
-<p align="center">
-	<img src="intro2.png" alt="Claude" />
-</p>
+<p align="center"><img src="intro.ch.jpg" alt="ChatGPT" /></p>
 
-## Screenshot for Gemini
-<p align="center">
-	<img src="intro3.png" alt="Gemini" />
-</p>
+<p align="center"><img src="intro.ge.png" alt="Gemini" /></p>
+
+<p align="center"><img src="intro.pe.png" alt="Perplexity" /></p>
 
 > [!NOTE]
 >
