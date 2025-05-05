@@ -12,7 +12,6 @@ extension Defaults.Keys {
 	
 	static let aiServices = Key<[SvcAi]>("aiServices", default: [
 		SvcAi(host: "claude.ai", name: "Claude.Ai", ico: "arrow.up.and.down.circle"),
-		SvcAi(host: "perplexity.ai", name: "Perplexity", ico: "arrow.up.and.down.circle"),
 		SvcAi(host: "chatgpt.com", name: "ChatGPT.com", ico: "arrow.down.right.circle"),
 		SvcAi(host: "gemini.google.com", name: "Gemini", ico: "arrow.up.and.down.circle"),
 		
