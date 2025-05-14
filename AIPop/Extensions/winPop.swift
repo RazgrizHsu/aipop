@@ -32,13 +32,17 @@ extension winPop : WKNavigationDelegate, WKUIDelegate
 			// Handle other types of navigation, including links opened by JavaScript
 			else if url.host != Defaults[.nowHost] && url.host != nil && url.scheme != "about"
 			{
-				log("[WebView] JS navigation detected to external URL: \(url.absoluteString)")
-				NSWorkspace.shared.open(url)
-				decisionHandler(.cancel)
+				log("[WebView] JS navigation detected to external URL: \(url)")
+				
+				// NSWorkspace.shared.open(url)
+				// decisionHandler(.cancel)
+				
+				// ex: claude will open www.claudeusercontent.com
+				decisionHandler(.allow)
 				return
 			}
 
-			log("[WebView] Navigating internally to: \(url.absoluteString)")
+			log("[WebView] Navigating internally to: \(url)")
 			decisionHandler(.allow)
 		}
 		else
@@ -48,17 +52,21 @@ extension winPop : WKNavigationDelegate, WKUIDelegate
 		}
 	}
 
-	// Handle window.open() calls
+	// Handle window.open() calls and target="_blank" links
 	func webView(_ webView: WKWebView, createWebViewWith configuration: WKWebViewConfiguration, for navigationAction: WKNavigationAction, windowFeatures: WKWindowFeatures) -> WKWebView?
 	{
 		if let url = navigationAction.request.url
 		{
-			log("[WebView] window.open() called for URL: \(url.absoluteString)")
+			if navigationAction.targetFrame == nil {
+				log("[WebView] target=\"_blank\" link detected for URL: \(url.absoluteString)")
+			} else {
+				log("[WebView] window.open() called for URL: \(url.absoluteString)")
+			}
 
 			// Check for special URL schemes
 			if url.scheme == "about" || url.absoluteString == "about:blank"
 			{
-				log("[WebView] Special URL scheme in window.open(): \(url.absoluteString)")
+				log("[WebView] Special URL scheme in new window request: \(url.absoluteString)")
 				// For about:blank, we can either create a new WebView and return it, or load in the current WebView
 				// Here we choose to load in the current WebView
 				return nil
@@ -66,7 +74,7 @@ extension winPop : WKNavigationDelegate, WKUIDelegate
 
 			if url.host != Defaults[.nowHost] && url.host != nil
 			{
-				log("[WebView] Opening window.open() URL in external browser: \(url.absoluteString)")
+				log("[WebView] Opening external URL in system browser: \(url.absoluteString)")
 				NSWorkspace.shared.open(url)
 			}
 			else
@@ -79,7 +87,7 @@ extension winPop : WKNavigationDelegate, WKUIDelegate
 		return nil
 	}
 
-	// Handle target="_blank" links
+	// Handle navigation responses
 	func webView(_ webView: WKWebView, decidePolicyFor navigationResponse: WKNavigationResponse, decisionHandler: @escaping (WKNavigationResponsePolicy) -> Void)
 	{
 		if let url = navigationResponse.response.url

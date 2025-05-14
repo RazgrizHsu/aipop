@@ -1,5 +1,7 @@
 #!/bin/bash
 
+# usage: ./bu --ver /app/raz
+
 SCHEME="AIPop"
 CONFIGURATION="Debug"
 PROJECT_NAME="$SCHEME.xcodeproj"
