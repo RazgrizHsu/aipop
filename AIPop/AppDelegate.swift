@@ -14,8 +14,6 @@ func log( _ message: String )
 
 @MainActor class AppDelegate: NSObject, NSApplicationDelegate
 {
-	//var state: AppState!
-	
 	static var panes: [SettingsPane] = [ BaseSettingsViewController() ]
 	static var settingsWindowController = SettingsWindowController(
 		panes: panes,
@@ -23,11 +21,11 @@ func log( _ message: String )
 		animated: true,
 		hidesToolbarForSingleItem: true
 	)
-	
+
 	func applicationDidFinishLaunching(_ notification: Notification)
 	{
 		MBC.shared = MBC()
-		
+
 		if KeyboardShortcuts.getShortcut(for: .toggleApp) == nil
 		{
 			KeyboardShortcuts.Name.resetAll()
@@ -36,7 +34,7 @@ func log( _ message: String )
 		{
 			_ = KeyboardShortcuts.getShortcut(for: .toggleApp)
 		}
-		
+
 		KeyboardShortcuts.onKeyDown( for: .toggleApp )
 		{
 			MBC.shared.togglePopover()
@@ -49,15 +47,17 @@ func log( _ message: String )
 class MBC
 {
 	static var shared:MBC!
-	
+
 	var wpop: winPop?
 	var warr: winImage?
 	private var wmov: winImage?
 	private var wbtn: winBtns?
-	
+
 	var statusItem: NSStatusItem?
 	var menu = NSMenu()
-	
+
+	private var previousApp: NSRunningApplication?
+
 	public static var monId : Int
 	{
 		get
@@ -66,12 +66,12 @@ class MBC
 				  let idx = NSScreen.screens.firstIndex(of: scr) else {
 				return 0
 			}
-			
+
 			return idx
 		}
 	}
 
-	
+
 	init()
 	{
 		statusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.variableLength)
@@ -80,14 +80,14 @@ class MBC
 			btn.action = #selector(statusItemClicked(sender:))
 			btn.sendAction(on: [.leftMouseUp, .rightMouseUp]) // 設置對左鍵和右鍵單擊的響應
 			btn.target = self
-			
+
 			if let img = NSImage( named: NSImage.Name( "AppIcon" ) )
 			{
 				img.size = NSSize(width: 20, height: 20)
 				btn.image = img
 			}
 		}
-		
+
 		menu.addItem( fw.ui.makeMenuItemBy( "Toggle", #selector(self.togglePopover), self ) )
 		menu.addItem( fw.ui.makeMenuItemBy( "Settings", #selector(clicked_Settings), self ) )
 		menu.addItem( fw.ui.makeMenuItemBy( "Reload", #selector(clicked_Reload), self ) )
@@ -96,17 +96,17 @@ class MBC
 		menu.addItem( fw.ui.makeMenuItemBy( "Clear Data", #selector(clicked_Clear), self ))
 		menu.addItem( NSMenuItem.separator() )
 		menu.addItem( fw.ui.makeMenuItemBy( "Quit", #selector(quitApp), "q", self ) )
-		
+
 		//NotificationCenter.default.addObserver(self, selector: #selector(windowBecameKey), name: NSWindow.didBecomeKeyNotification, object: nil)
 	}
-	
+
 
 //	@objc func windowBecameKey(notification: Notification) {
 //		guard let window = notification.object as? NSWindow else { return }
 //		log("Key Window title[ \(window.title) ] frame[ \(window.frame) ]")
 //	}
-	
-	
+
+
 	@objc func statusItemClicked(sender: NSStatusBarButton)
 	{
 		let event = NSApp.currentEvent!
@@ -121,7 +121,7 @@ class MBC
 			togglePopover()
 		}
 	}
-	
+
 	@MainActor @objc func clicked_Settings()
 	{
 		if !AppDelegate.settingsWindowController.window!.isVisible
@@ -133,11 +133,11 @@ class MBC
 			AppDelegate.settingsWindowController.close()
 		}
 	}
-	
+
 	@MainActor @objc func clicked_Reload() { wpop?.reloadWebView() }
-	
+
 	@MainActor @objc func clicked_ResetPosition() { wpop?.resetPositions(true) }
-	
+
 	@MainActor @objc func clicked_Clear()
 	{
 		let dataStore = WKWebsiteDataStore.default()
@@ -152,12 +152,12 @@ class MBC
 			}
 		}
 	}
-	
+
 	@objc func quitApp()
 	{
 		NSApplication.shared.terminate(self)
 	}
-	
+
 	@objc func togglePopover()
 	{
 		if let pop = wpop, pop.isVisible
@@ -167,11 +167,15 @@ class MBC
 				pop.resetPositions()
 				warr?.orderOut(nil)
 				pop.orderOut(nil)
+
+				if let prevApp = previousApp, prevApp != NSRunningApplication.current {
+					prevApp.activate(options: [])
+				}
 			}
 			else
 			{
 				if( pop.isMonChange ) { pop.resetPositions() }
-				
+
 				NSApp.activate(ignoringOtherApps: true)
 				warr?.orderFront(nil)
 				pop.makeKeyAndOrderFront(nil)
@@ -180,39 +184,41 @@ class MBC
 		}
 		else
 		{
+			previousApp = NSWorkspace.shared.frontmostApplication
+
 			if( wpop == nil )
 			{
 				wpop = winPop()
 				wpop!.title = "pop"
 				warr = winImage( "arrow.up.circle.fill" )
-				
+
 				wmov = winImage( "arrow.up.and.down.and.arrow.left.and.right", wpop )
 				wmov?.offset = NSPoint( x: 12, y: -3.8 )
 				wmov?.level = .popUpMenu
 				wmov?.parent = wpop
 				wmov?.title = "mov"
-				
+
 				wbtn = winBtns( )
 				wbtn?.offset = NSPoint( x: 39, y: -12 )
 				wbtn?.level = .popUpMenu
 				wbtn?.parent = wpop
 				wbtn?.title = "btns"
-				
+
 				wpop?.wins.append( wbtn! )
 				wpop?.wins.append( wmov! )
 			}
-			
+
 			guard let pop = wpop else { return }
-			
+
 			pop.resetPositions()
 			pop.resetRefPos()
-			
+
 			NSApp.activate(ignoringOtherApps: true)
-			
+
 			warr?.orderFront(nil)
 			wmov?.makeKeyAndOrderFront(nil)
 			wbtn?.makeKeyAndOrderFront(nil)
-			
+
 			pop.makeKeyAndOrderFront(nil)
 		}
 	}

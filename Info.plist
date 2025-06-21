@@ -5,7 +5,7 @@
 	<key>LSUIElement</key>
 	<true/>
     <key>CFBundleVersion</key>
-    <string>38</string>
+    <string>40</string>
     <key>CFBundleShortVersionString</key>
     <string>1.2.7</string>
 </dict>

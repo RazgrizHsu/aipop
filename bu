@@ -1,6 +1,13 @@
 #!/bin/bash
 
-# usage: ./bu --ver /app/raz
+# usage: 
+# ./bu                              - Build only
+# ./bu --ver                        - Increment version and build
+# ./bu --ver 1.0.0                  - Set specific version and build
+# ./bu --install                    - Build and install to /Applications/raz
+# ./bu --install /custom/path       - Build and install to custom path
+# ./bu --pub                        - Build and publish to GitHub release
+# ./bu --ver --pub --install        - Full workflow: version, build, publish, install
 
 SCHEME="AIPop"
 CONFIGURATION="Debug"
@@ -23,20 +30,70 @@ increment_version() {
 NEW_VERSION=""
 DEST_PATH=""
 UPDATE_VER=false
+PUBLISH_RELEASE=false
+INSTALL_APP=false
 
-for ARG in "$@"; do
-    if [[ $ARG == "--ver" ]]; then
-        UPDATE_VER=true
-    elif [[ $ARG =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
-        NEW_VERSION=$ARG
-        UPDATE_VER=true
-    elif [[ $ARG =~ ^/.* ]]; then
-        DEST_PATH=$ARG
-        if [[ $DEST_PATH == /app/* ]]; then
-            DEST_PATH="/Applications/${DEST_PATH:5}"
-        fi
-    fi
+i=1
+while [[ $i -le $# ]]; do
+    ARG="${!i}"
+    case $ARG in
+        --ver)
+            UPDATE_VER=true
+            # Check if next argument is a version number
+            NEXT_ARG=$((i + 1))
+            if [[ $NEXT_ARG -le $# ]]; then
+                NEXT_VAL="${!NEXT_ARG}"
+                if [[ $NEXT_VAL =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+                    NEW_VERSION=$NEXT_VAL
+                    i=$((i + 1))
+                fi
+            fi
+            ;;
+        --pub)
+            PUBLISH_RELEASE=true
+            ;;
+        --install)
+            INSTALL_APP=true
+            # Check if next argument is a path
+            NEXT_ARG=$((i + 1))
+            if [[ $NEXT_ARG -le $# ]]; then
+                NEXT_VAL="${!NEXT_ARG}"
+                if [[ $NEXT_VAL =~ ^/.* ]]; then
+                    DEST_PATH=$NEXT_VAL
+                    i=$((i + 1))
+                else
+                    DEST_PATH="/Applications/raz"
+                fi
+            else
+                DEST_PATH="/Applications/raz"
+            fi
+            ;;
+    esac
+    i=$((i + 1))
 done
+
+# Check and install GitHub CLI if needed
+if [ "$PUBLISH_RELEASE" = true ]; then
+    if ! command -v gh &> /dev/null; then
+        echo "GitHub CLI not found. Installing via Homebrew..."
+        if ! command -v brew &> /dev/null; then
+            echo "Error: Homebrew not found. Please install Homebrew first."
+            exit 1
+        fi
+        brew install gh
+        if [ $? -ne 0 ]; then
+            echo "Failed to install GitHub CLI."
+            exit 1
+        fi
+        echo "GitHub CLI installed successfully."
+    fi
+    
+    # Check if user is logged in to GitHub
+    if ! gh auth status &> /dev/null; then
+        echo "You are not logged in to GitHub. Please run 'gh auth login' first."
+        exit 1
+    fi
+fi
 
 # Increment build number
 agvtool next-version -all
@@ -88,16 +145,20 @@ else
     echo "version number: $VERSION"
 fi
 
-# Copy app if destination is specified
-if [ -n "$DEST_PATH" ]; then
-    if [ -d "$DEST_PATH" ]; then
+# Install app if requested
+if [ "$INSTALL_APP" = true ]; then
+    echo "Installing app to $DEST_PATH..."
+    if [ ! -d "$DEST_PATH" ]; then
+        mkdir -p "$DEST_PATH"
+    fi
+    if [ -d "$DEST_PATH/$SCHEME.app" ]; then
         rm -rf "$DEST_PATH/$SCHEME.app"
     fi
     cp -R "$APP_PATH" "$DEST_PATH"
     if [ $? -eq 0 ]; then
-        echo "App copied to $DEST_PATH successfully."
+        echo "App installed to $DEST_PATH successfully."
     else
-        echo "Failed to copy app to $DEST_PATH."
+        echo "Failed to install app to $DEST_PATH."
         exit 1
     fi
 fi
@@ -120,3 +181,65 @@ else
 fi
 cd -
 rm -rf "$TEMP_DIR"
+
+# Publish to GitHub Release if requested
+if [ "$PUBLISH_RELEASE" = true ]; then
+    echo "Publishing release to GitHub..."
+    
+    TAG_NAME="v$VERSION"
+    RELEASE_TITLE="Release $VERSION"
+    
+    # Get latest commits for release notes
+    LATEST_TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "")
+    if [ -n "$LATEST_TAG" ]; then
+        COMMIT_RANGE="$LATEST_TAG..HEAD"
+        echo "Generating release notes from commits since $LATEST_TAG"
+    else
+        COMMIT_RANGE="HEAD~10..HEAD"
+        echo "No previous tags found, using last 10 commits"
+    fi
+    
+    COMMIT_LOG=$(git log --oneline --no-merges $COMMIT_RANGE)
+    if [ -z "$COMMIT_LOG" ]; then
+        COMMIT_LOG="- No new commits since last release"
+    else
+        COMMIT_LOG=$(echo "$COMMIT_LOG" | sed 's/^/- /')
+    fi
+    
+    RELEASE_NOTES="Release $VERSION
+
+Built with Xcode on $(date +'%Y-%m-%d %H:%M:%S')
+
+## Changes
+$COMMIT_LOG
+
+## Download
+- Download the zip file and extract to get AIPop.app
+- Move AIPop.app to Applications folder"
+    
+    # Check if tag already exists
+    if git rev-parse "$TAG_NAME" >/dev/null 2>&1; then
+        echo "Tag $TAG_NAME already exists. Deleting existing tag and release..."
+        git tag -d "$TAG_NAME" 2>/dev/null || true
+        git push origin --delete "$TAG_NAME" 2>/dev/null || true
+        gh release delete "$TAG_NAME" --yes 2>/dev/null || true
+    fi
+    
+    # Create and push tag
+    git tag -a "$TAG_NAME" -m "Release $VERSION"
+    git push origin "$TAG_NAME"
+    
+    # Create GitHub release with zip file
+    gh release create "$TAG_NAME" \
+        --title "$RELEASE_TITLE" \
+        --notes "$RELEASE_NOTES" \
+        "$ZIP_FILE"
+    
+    if [ $? -eq 0 ]; then
+        echo "Successfully published release $TAG_NAME to GitHub!"
+        echo "Release URL: $(gh release view $TAG_NAME --web --json url -q .url 2>/dev/null || echo 'Check GitHub releases page')"
+    else
+        echo "Failed to publish release to GitHub."
+        exit 1
+    fi
+fi
