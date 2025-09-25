@@ -37,7 +37,10 @@ func log( _ message: String )
 
 		KeyboardShortcuts.onKeyDown( for: .toggleApp )
 		{
-			MBC.shared.togglePopover()
+			let isWebViewFocused = MBC.shared.wpop?.isKeyWindow == true
+			if !Shortcut.shouldPreventToggle(for: NSApp.currentEvent!, isWebViewFocused: isWebViewFocused) {
+				MBC.shared.togglePopover()
+			}
 		}
 	}
 }
@@ -137,6 +140,17 @@ class MBC
 	@MainActor @objc func clicked_Reload() { wpop?.reloadWebView() }
 
 	@MainActor @objc func clicked_ResetPosition() { wpop?.resetPositions(true) }
+
+	@MainActor func switchToSite(index: Int) {
+		let svcs = Defaults[.aiServices]
+		guard index < svcs.count else { return }
+
+		let targetHost = svcs[index].host
+		if Defaults[.nowHost] != targetHost {
+			Defaults[.nowHost] = targetHost
+			clicked_Reload()
+		}
+	}
 
 	@MainActor @objc func clicked_Clear()
 	{

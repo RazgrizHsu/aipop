@@ -11,15 +11,15 @@ import KeyboardShortcuts
 class DragImgView: NSImageView
 {
 	var wpop: winPop?
-	
+
 	private var cursor: NSCursor = .openHand
-	
+
 	private var area: NSTrackingArea?
-	
+
 	override func viewWillMove(toWindow newWindow: NSWindow?)
 	{
 		super.viewWillMove(toWindow: newWindow)
-		
+
 		if let existArea = area { removeTrackingArea(existArea) }
 		area = NSTrackingArea(
 			rect: .zero,
@@ -28,40 +28,40 @@ class DragImgView: NSImageView
 			userInfo: nil
 		)
 		addTrackingArea(area!)
-		
+
 		self.window?.invalidateCursorRects(for: self)
 	}
-	
+
 	override func resetCursorRects() {
 		super.resetCursorRects()
 		self.addCursorRect(self.bounds, cursor: cursor)
 	}
-	
+
 	override func mouseEntered(with event: NSEvent) {
 		super.mouseEntered(with: event)
 		cursor.push()
 	}
-	
+
 	override func mouseExited(with event: NSEvent) {
 		super.mouseExited(with: event)
 		cursor.pop()
 	}
 	//override func mouseDown(with event: NSEvent) { isDrag = true }
 	//override func mouseUp(with event: NSEvent) { isDrag = false }
-	
+
 	override func mouseDragged(with event: NSEvent)
 	{
 		//if !isDrag { return }
-		
+
 		let deltaX = event.deltaX
 		let deltaY = event.deltaY
-		
+
 		if let mwin = self.window, let pop = wpop
 		{
 			let mf = mwin.frame
 			let nX = mf.origin.x + deltaX
 			let nY = mf.origin.y - deltaY
-			
+
 			let scr = NSScreen.main!.visibleFrame
 			if nX >= scr.minX,      nX + mf.width <= scr.maxX,
 			   nY >= scr.minY + 10, nY + mf.height <= scr.maxY
@@ -73,9 +73,9 @@ class DragImgView: NSImageView
 }
 
 class baseWin : NSWindow {
-	
+
 	public var offset: NSPoint = NSPoint.zero
-	
+
 	override var canBecomeKey: Bool { return false }
 
 //	override func becomeKey() {
@@ -253,7 +253,10 @@ class winPop: NSWindow, NSWindowDelegate
 			webView.trailingAnchor.constraint(equalTo: self.contentView!.trailingAnchor)
 		])
 
-		webView.load(URLRequest(url: URL(string: "https://\( Defaults[.nowHost] )")!))
+		let host = "https://\( Defaults[.nowHost] )"
+
+		log( "[wpop:load] url[\(host)]" )
+		webView.load(URLRequest(url: URL(string: host)!))
 	}
 
 	func windowDidBecomeKey(_ notification: Notification)
@@ -402,6 +405,10 @@ class winPop: NSWindow, NSWindowDelegate
 		if self.checkShortcutMatch( .reloadWeb, event )
 		{
 			self.reloadWebView()
+			return
+		}
+
+		if Shortcut.triggerSwitchSite(for: event) {
 			return
 		}
 

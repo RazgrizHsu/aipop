@@ -4,8 +4,7 @@
 # ./bu                              - Build only
 # ./bu --ver                        - Increment version and build
 # ./bu --ver 1.0.0                  - Set specific version and build
-# ./bu --install                    - Build and install to /Applications/raz
-# ./bu --install /custom/path       - Build and install to custom path
+# ./bu --install                    - Build and install to /Applications
 # ./bu --pub                        - Build and publish to GitHub release
 # ./bu --ver --pub --install        - Full workflow: version, build, publish, install
 
@@ -14,6 +13,7 @@ CONFIGURATION="Debug"
 PROJECT_NAME="$SCHEME.xcodeproj"
 BUILD_DIR="build"
 DESTINATION="generic/platform=macos"
+PATH_INSTALL="/Applications/raz/"
 
 rm -rf build/*.zip
 
@@ -54,19 +54,7 @@ while [[ $i -le $# ]]; do
             ;;
         --install)
             INSTALL_APP=true
-            # Check if next argument is a path
-            NEXT_ARG=$((i + 1))
-            if [[ $NEXT_ARG -le $# ]]; then
-                NEXT_VAL="${!NEXT_ARG}"
-                if [[ $NEXT_VAL =~ ^/.* ]]; then
-                    DEST_PATH=$NEXT_VAL
-                    i=$((i + 1))
-                else
-                    DEST_PATH="/Applications/raz"
-                fi
-            else
-                DEST_PATH="/Applications/raz"
-            fi
+            DEST_PATH="/Applications"
             ;;
     esac
     i=$((i + 1))
@@ -128,6 +116,10 @@ fi
 
 # Build the project
 xcodebuild -project "$PROJECT_NAME" -scheme "$SCHEME" -configuration "$CONFIGURATION" -destination "$DESTINATION" -derivedDataPath "$BUILD_DIR"
+if [ $? -ne 0 ]; then
+    echo "Build failed"
+    exit 1
+fi
 
 APP_PATH=$(find "$BUILD_DIR" -name "$SCHEME.app" -print -quit)
 if [ -z "$APP_PATH" ]; then
@@ -143,6 +135,29 @@ if [ -z "$VERSION" ]; then
     exit 1
 else
     echo "version number: $VERSION"
+fi
+
+# Auto install if PATH_INSTALL exists
+if [ -d "$PATH_INSTALL" ]; then
+    echo "PATH_INSTALL directory exists, auto installing to $PATH_INSTALL..."
+
+    # Kill running instance if exists
+    if [ -d "$PATH_INSTALL/$SCHEME.app" ]; then
+        echo "Terminating running $SCHEME instances..."
+        pkill -f "$SCHEME" 2>/dev/null || true
+        sleep 1
+        rm -rf "$PATH_INSTALL/$SCHEME.app"
+    fi
+
+    cp -R "$APP_PATH" "$PATH_INSTALL"
+    if [ $? -eq 0 ]; then
+        echo "App auto-installed to $PATH_INSTALL successfully."
+        echo "Launching $SCHEME..."
+        open "$PATH_INSTALL/$SCHEME.app"
+    else
+        echo "Failed to auto-install app to $PATH_INSTALL."
+        exit 1
+    fi
 fi
 
 # Install app if requested

@@ -25,6 +25,7 @@
 		75D334C12C6002420074C2A3 /* windows.swift in Sources */ = {isa = PBXBuildFile; fileRef = 75D334C02C6002420074C2A3 /* windows.swift */; };
 		75D334C32C6004E20074C2A3 /* SiteBtnsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 75D334C22C6004E20074C2A3 /* SiteBtnsView.swift */; };
 		75DE712D2C048D390095F0D0 /* winPop.swift in Sources */ = {isa = PBXBuildFile; fileRef = 75DE712C2C048D390095F0D0 /* winPop.swift */; };
+		75F052CF2E85433800518F27 /* shortcut.swift in Sources */ = {isa = PBXBuildFile; fileRef = 75F052CE2E85433800518F27 /* shortcut.swift */; };
 		C57241EA2B67CF5900703101 /* AIPopTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C57241E92B67CF5900703101 /* AIPopTests.swift */; };
 /* End PBXBuildFile section */
 
@@ -40,6 +41,7 @@
 		75D334C02C6002420074C2A3 /* windows.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = windows.swift; sourceTree = "<group>"; };
 		75D334C22C6004E20074C2A3 /* SiteBtnsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SiteBtnsView.swift; sourceTree = "<group>"; };
 		75DE712C2C048D390095F0D0 /* winPop.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = winPop.swift; sourceTree = "<group>"; };
+		75F052CE2E85433800518F27 /* shortcut.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = shortcut.swift; sourceTree = "<group>"; };
 		75F2242A2C028F3800D714C9 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		C5091C7C2B5C4D8A0091896F /* App.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = App.swift; sourceTree = "<group>"; };
 		C5091C802B5C4D8B0091896F /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -118,6 +120,7 @@
 				C57800932B7C7BF900B40EEC /* AppDelegate.swift */,
 				C5091C802B5C4D8B0091896F /* Assets.xcassets */,
 				753BCB302BB8C0EA006CBC64 /* AIPop.entitlements */,
+				75F052CE2E85433800518F27 /* shortcut.swift */,
 				75D334C02C6002420074C2A3 /* windows.swift */,
 				75306AD82C64F56600B45D77 /* Notifier.swift */,
 			);
@@ -275,6 +278,7 @@
 				753BCB352BB8C1A4006CBC64 /* Functions.swift in Sources */,
 				75C4EC162BFED6660045394B /* Base.swift in Sources */,
 				753BCB3A2BB8C1A4006CBC64 /* @Settings.swift in Sources */,
+				75F052CF2E85433800518F27 /* shortcut.swift in Sources */,
 				75306AD92C64F56600B45D77 /* Notifier.swift in Sources */,
 				753BCB3B2BB8C1A4006CBC64 /* @Defaults.swift in Sources */,
 				750473A82C0F174700317CA9 /* VC.swift in Sources */,
@@ -308,7 +312,7 @@
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 40;
+				CURRENT_PROJECT_VERSION = 56;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_ASSET_PATHS = "";
 				DEVELOPMENT_TEAM = KT5ZZ9Q8DJ;
@@ -344,7 +348,7 @@
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 40;
+				CURRENT_PROJECT_VERSION = 56;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_ASSET_PATHS = "";
 				DEVELOPMENT_TEAM = KT5ZZ9Q8DJ;

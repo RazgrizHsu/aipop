@@ -9,17 +9,17 @@ struct SvcAi: Codable, Defaults.Serializable {
 }
 
 extension Defaults.Keys {
-	
+
 	static let aiServices = Key<[SvcAi]>("aiServices", default: [
 		SvcAi(host: "claude.ai", name: "Claude.Ai", ico: "arrow.up.and.down.circle"),
 		SvcAi(host: "chatgpt.com", name: "ChatGPT.com", ico: "arrow.down.right.circle"),
-		SvcAi(host: "gemini.google.com", name: "Gemini", ico: "arrow.up.and.down.circle"),
-		
+		SvcAi(host: "gemini.google.com/app", name: "Gemini", ico: "arrow.up.and.down.circle"),
+
 	])
 
 	static let nowHost = Key<String>( "host", default: "claude.ai" )
 	static let dicPopFrame = Key<[Int: NSRect]>( "dicPopFrame", default: [:] )
-	
+
 	//private let fixNSRectBridge = NSRect.zero
 	//static let bak = Key<NSRect>( "bak", default: fixNSRectBridge )
 }
