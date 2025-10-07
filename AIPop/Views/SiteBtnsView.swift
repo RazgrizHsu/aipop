@@ -50,13 +50,14 @@ struct styleBtn: ButtonStyle {
 
 struct SiteBtnsView: View {
 	@Default(.nowHost) private var selected
+	@Default(.aiServices) private var svcs
 
 	var body: some View {
 		Form {
 			VStack {
 				HStack {
-					
-					ForEach( Defaults[.aiServices], id: \.host )
+
+					ForEach( svcs, id: \.host )
 					{ svc in
 						Button(action: {
 							selected = svc.host
@@ -68,11 +69,14 @@ struct SiteBtnsView: View {
 						.buttonStyle(styleBtn(av: selected == svc.host ))
 						.disabled(selected == svc.host)
 					}
-					
+
 				}
 			}
 		}
 		.padding(10)
+		.onChange(of: svcs) { _ in
+			MBC.shared.wbtn?.updateSize()
+		}
 	}
 }
 

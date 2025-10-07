@@ -1,260 +1,238 @@
-#!/bin/bash
+#!/usr/bin/env python3
 
-# usage: 
-# ./bu                              - Build only
-# ./bu --ver                        - Increment version and build
-# ./bu --ver 1.0.0                  - Set specific version and build
-# ./bu --install                    - Build and install to /Applications
-# ./bu --pub                        - Build and publish to GitHub release
-# ./bu --ver --pub --install        - Full workflow: version, build, publish, install
+import os
+import sys
+import shutil
+import subprocess
+import tempfile
+import re
+from pathlib import Path
+from datetime import datetime
 
-SCHEME="AIPop"
-CONFIGURATION="Debug"
-PROJECT_NAME="$SCHEME.xcodeproj"
-BUILD_DIR="build"
-DESTINATION="generic/platform=macos"
-PATH_INSTALL="/Applications/raz/"
+SCHEME = "AIPop"
+CONFIGURATION = "Debug"
+PROJECT_NAME = f"{SCHEME}.xcodeproj"
+BUILD_DIR = "build"
+DESTINATION = "generic/platform=macos"
+PATH_INSTALL = "/Applications/raz/"
 
-rm -rf build/*.zip
+verbose = False
 
-# Function to increment version
-increment_version() {
-    local version=$1
-    local delimiter=.
-    local array=($(echo "$version" | tr $delimiter '\n'))
-    array[$((${#array[@]} - 1))]=$((${array[$((${#array[@]} - 1))]} + 1))
-    echo $(local IFS=$delimiter ; echo "${array[*]}")
-}
+def log(msg, force=False):
+	if verbose or force:
+		print(msg)
 
-# Parse arguments
-NEW_VERSION=""
-DEST_PATH=""
-UPDATE_VER=false
-PUBLISH_RELEASE=false
-INSTALL_APP=false
+def err(msg):
+	print(f"Error: {msg}", file=sys.stderr)
+	sys.exit(1)
 
-i=1
-while [[ $i -le $# ]]; do
-    ARG="${!i}"
-    case $ARG in
-        --ver)
-            UPDATE_VER=true
-            # Check if next argument is a version number
-            NEXT_ARG=$((i + 1))
-            if [[ $NEXT_ARG -le $# ]]; then
-                NEXT_VAL="${!NEXT_ARG}"
-                if [[ $NEXT_VAL =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
-                    NEW_VERSION=$NEXT_VAL
-                    i=$((i + 1))
-                fi
-            fi
-            ;;
-        --pub)
-            PUBLISH_RELEASE=true
-            ;;
-        --install)
-            INSTALL_APP=true
-            DEST_PATH="/Applications"
-            ;;
-    esac
-    i=$((i + 1))
-done
+def run(cmd, quiet=True):
+	log(f"執行: {' '.join(cmd) if isinstance(cmd, list) else cmd}")
+	result = subprocess.run(
+		cmd,
+		shell=isinstance(cmd, str),
+		capture_output=quiet,
+		text=True
+	)
+	if result.returncode != 0:
+		if quiet and result.stderr:
+			log(result.stderr)
+		return None
+	return result.stdout.strip() if quiet else ""
 
-# Check and install GitHub CLI if needed
-if [ "$PUBLISH_RELEASE" = true ]; then
-    if ! command -v gh &> /dev/null; then
-        echo "GitHub CLI not found. Installing via Homebrew..."
-        if ! command -v brew &> /dev/null; then
-            echo "Error: Homebrew not found. Please install Homebrew first."
-            exit 1
-        fi
-        brew install gh
-        if [ $? -ne 0 ]; then
-            echo "Failed to install GitHub CLI."
-            exit 1
-        fi
-        echo "GitHub CLI installed successfully."
-    fi
-    
-    # Check if user is logged in to GitHub
-    if ! gh auth status &> /dev/null; then
-        echo "You are not logged in to GitHub. Please run 'gh auth login' first."
-        exit 1
-    fi
-fi
+def incVer(ver):
+	parts = ver.split('.')
+	parts[-1] = str(int(parts[-1]) + 1)
+	return '.'.join(parts)
 
-# Increment build number
-agvtool next-version -all
-if [ $? -eq 0 ]; then
-    echo "Build number incremented successfully."
-else
-    echo "Failed to increment build number."
-    exit 1
-fi
+def main():
+	global verbose
 
-# Handle version update
-CURRENT_VERSION=$(agvtool what-marketing-version -terse1)
-if [ -z "$CURRENT_VERSION" ]; then
-    echo "Failed to get current marketing version."
-    exit 1
-fi
+	args = sys.argv[1:]
+	upVer = False
+	newVer = ""
+	pubRelease = False
+	installApp = False
+	destPath = ""
 
-if [ "$UPDATE_VER" = true ]; then
-    if [ -z "$NEW_VERSION" ]; then
-        NEW_VERSION=$(increment_version "$CURRENT_VERSION")
-    fi
-    agvtool new-marketing-version $NEW_VERSION
-    if [ $? -eq 0 ]; then
-        echo "Updated marketing version to $NEW_VERSION."
-    else
-        echo "Failed to update marketing version."
-        exit 1
-    fi
-else
-    NEW_VERSION=$CURRENT_VERSION
-fi
+	i = 0
+	while i < len(args):
+		arg = args[i]
+		if arg == "--verbose":
+			verbose = True
+		elif arg == "--ver":
+			upVer = True
+			if i + 1 < len(args) and re.match(r'^\d+\.\d+\.\d+$', args[i + 1]):
+				newVer = args[i + 1]
+				i += 1
+		elif arg == "--pub":
+			pubRelease = True
+		elif arg == "--install":
+			installApp = True
+			destPath = "/Applications"
+		i += 1
 
-# Build the project
-xcodebuild -project "$PROJECT_NAME" -scheme "$SCHEME" -configuration "$CONFIGURATION" -destination "$DESTINATION" -derivedDataPath "$BUILD_DIR"
-if [ $? -ne 0 ]; then
-    echo "Build failed"
-    exit 1
-fi
+	for zf in Path(BUILD_DIR).glob("*.zip"):
+		zf.unlink()
 
-APP_PATH=$(find "$BUILD_DIR" -name "$SCHEME.app" -print -quit)
-if [ -z "$APP_PATH" ]; then
-    echo "not found .app"
-    exit 1
-else
-    echo "build success, app path: $APP_PATH"
-fi
+	if pubRelease:
+		if not shutil.which("gh"):
+			err("gh not found, please install GitHub CLI")
+		if run("gh auth status") is None:
+			err("Not logged in to GitHub, run 'gh auth login'")
 
-VERSION=$(/usr/libexec/PlistBuddy -c "Print CFBundleShortVersionString" "$APP_PATH/Contents/Info.plist")
-if [ -z "$VERSION" ]; then
-    echo "not found version number"
-    exit 1
-else
-    echo "version number: $VERSION"
-fi
+	print("Stage 1: Update version")
+	out = run("agvtool next-version -all")
+	if out is None:
+		err("Failed to update build number")
+	log(out)
 
-# Auto install if PATH_INSTALL exists
-if [ -d "$PATH_INSTALL" ]; then
-    echo "PATH_INSTALL directory exists, auto installing to $PATH_INSTALL..."
+	curVer = run("agvtool what-marketing-version -terse1")
+	if not curVer:
+		err("Failed to get current version")
 
-    # Kill running instance if exists
-    if [ -d "$PATH_INSTALL/$SCHEME.app" ]; then
-        echo "Terminating running $SCHEME instances..."
-        pkill -f "$SCHEME" 2>/dev/null || true
-        sleep 1
-        rm -rf "$PATH_INSTALL/$SCHEME.app"
-    fi
+	if upVer:
+		newVer = newVer or incVer(curVer)
+		out = run(f"agvtool new-marketing-version {newVer}")
+		if out is None:
+			err("Failed to update version")
+		log(out)
+		print(f"Version updated: {curVer} → {newVer}")
+	else:
+		newVer = curVer
+		print(f"Current version: {newVer}")
 
-    cp -R "$APP_PATH" "$PATH_INSTALL"
-    if [ $? -eq 0 ]; then
-        echo "App auto-installed to $PATH_INSTALL successfully."
-        echo "Launching $SCHEME..."
-        open "$PATH_INSTALL/$SCHEME.app"
-    else
-        echo "Failed to auto-install app to $PATH_INSTALL."
-        exit 1
-    fi
-fi
+	print("Stage 2: Build project")
+	cmd = [
+		"xcodebuild",
+		"-project", PROJECT_NAME,
+		"-scheme", SCHEME,
+		"-configuration", CONFIGURATION,
+		"-destination", DESTINATION,
+		"-derivedDataPath", BUILD_DIR
+	]
 
-# Install app if requested
-if [ "$INSTALL_APP" = true ]; then
-    echo "Installing app to $DEST_PATH..."
-    if [ ! -d "$DEST_PATH" ]; then
-        mkdir -p "$DEST_PATH"
-    fi
-    if [ -d "$DEST_PATH/$SCHEME.app" ]; then
-        rm -rf "$DEST_PATH/$SCHEME.app"
-    fi
-    cp -R "$APP_PATH" "$DEST_PATH"
-    if [ $? -eq 0 ]; then
-        echo "App installed to $DEST_PATH successfully."
-    else
-        echo "Failed to install app to $DEST_PATH."
-        exit 1
-    fi
-fi
+	result = subprocess.run(cmd, capture_output=not verbose, text=True)
+	if result.returncode != 0:
+		if not verbose:
+			print(result.stderr)
+		err("Build failed")
 
-# Create zip file
-TEMP_DIR=$(mktemp -d)
-cp -R "$APP_PATH" "$TEMP_DIR"
-echo "tmpdir: $TEMP_DIR"
-ZIP_FILE="${SCHEME}.${VERSION}.zip"
-cd "$TEMP_DIR"
-7z a -tzip -mx9 "$ZIP_FILE" "$SCHEME.app"
-if [ $? -eq 0 ]; then
-    mv "$ZIP_FILE" "$OLDPWD"
-    echo "compression success, zip file: $OLDPWD/$ZIP_FILE"
-else
-    echo "compression failed"
-    cd -
-    rm -rf "$TEMP_DIR"
-    exit 1
-fi
-cd -
-rm -rf "$TEMP_DIR"
+	log(result.stdout)
 
-# Publish to GitHub Release if requested
-if [ "$PUBLISH_RELEASE" = true ]; then
-    echo "Publishing release to GitHub..."
-    
-    TAG_NAME="v$VERSION"
-    RELEASE_TITLE="Release $VERSION"
-    
-    # Get latest commits for release notes
-    LATEST_TAG=$(git describe --tags --abbrev=0 2>/dev/null || echo "")
-    if [ -n "$LATEST_TAG" ]; then
-        COMMIT_RANGE="$LATEST_TAG..HEAD"
-        echo "Generating release notes from commits since $LATEST_TAG"
-    else
-        COMMIT_RANGE="HEAD~10..HEAD"
-        echo "No previous tags found, using last 10 commits"
-    fi
-    
-    COMMIT_LOG=$(git log --oneline --no-merges $COMMIT_RANGE)
-    if [ -z "$COMMIT_LOG" ]; then
-        COMMIT_LOG="- No new commits since last release"
-    else
-        COMMIT_LOG=$(echo "$COMMIT_LOG" | sed 's/^/- /')
-    fi
-    
-    RELEASE_NOTES="Release $VERSION
+	appPath = None
+	for p in Path(BUILD_DIR).rglob(f"{SCHEME}.app"):
+		appPath = p
+		break
 
-Built with Xcode on $(date +'%Y-%m-%d %H:%M:%S')
+	if not appPath:
+		err(".app not found")
+
+	print(f"Build complete: {appPath}")
+
+	plist = appPath / "Contents/Info.plist"
+	ver = run(["/usr/libexec/PlistBuddy", "-c", "Print CFBundleShortVersionString", str(plist)])
+	if not ver:
+		err("Version not found")
+	print(f"App version: {ver}")
+
+	if Path(PATH_INSTALL).exists():
+		print("Stage 3: Auto install")
+		tgt = Path(PATH_INSTALL) / f"{SCHEME}.app"
+		if tgt.exists():
+			log(f"Terminating {SCHEME}")
+			subprocess.run(["pkill", "-f", SCHEME], stderr=subprocess.DEVNULL)
+			subprocess.run(["sleep", "1"])
+			shutil.rmtree(tgt)
+
+		shutil.copytree(appPath, tgt)
+		print(f"Installed to {PATH_INSTALL}")
+		print(f"Launching {SCHEME}")
+		subprocess.Popen(["open", str(tgt)])
+
+	if installApp:
+		print(f"Stage 4: Install to {destPath}")
+		dest = Path(destPath)
+		dest.mkdir(parents=True, exist_ok=True)
+		tgt = dest / f"{SCHEME}.app"
+		if tgt.exists():
+			shutil.rmtree(tgt)
+		shutil.copytree(appPath, tgt)
+		print(f"Installed to {destPath}")
+
+	print("Stage 5: Create zip")
+	tmpDir = tempfile.mkdtemp()
+	log(f"Temp dir: {tmpDir}")
+	tmpApp = Path(tmpDir) / f"{SCHEME}.app"
+	shutil.copytree(appPath, tmpApp)
+
+	zipFile = f"{SCHEME}.{ver}.zip"
+	result = subprocess.run(
+		["7z", "a", "-tzip", "-mx9", zipFile, f"{SCHEME}.app"],
+		cwd=tmpDir,
+		capture_output=not verbose
+	)
+
+	if result.returncode != 0:
+		shutil.rmtree(tmpDir)
+		err("Compression failed")
+
+	shutil.move(Path(tmpDir) / zipFile, zipFile)
+	shutil.rmtree(tmpDir)
+	print(f"Created: {zipFile}")
+
+	if pubRelease:
+		print("Stage 6: Publish to GitHub")
+		tag = f"v{ver}"
+		title = f"Release {ver}"
+
+		latestTag = run("git describe --tags --abbrev=0")
+		if latestTag:
+			rng = f"{latestTag}..HEAD"
+			log(f"Commits since {latestTag}")
+		else:
+			rng = "HEAD~10..HEAD"
+			log("No tags found, using last 10 commits")
+
+		commits = run(f"git log --oneline --no-merges {rng}")
+		if not commits:
+			commits = "- No new commits"
+		else:
+			commits = "\n".join(f"- {line}" for line in commits.split("\n"))
+
+		notes = f"""Release {ver}
+
+Built with Xcode on {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}
 
 ## Changes
-$COMMIT_LOG
+{commits}
 
 ## Download
 - Download the zip file and extract to get AIPop.app
-- Move AIPop.app to Applications folder"
-    
-    # Check if tag already exists
-    if git rev-parse "$TAG_NAME" >/dev/null 2>&1; then
-        echo "Tag $TAG_NAME already exists. Deleting existing tag and release..."
-        git tag -d "$TAG_NAME" 2>/dev/null || true
-        git push origin --delete "$TAG_NAME" 2>/dev/null || true
-        gh release delete "$TAG_NAME" --yes 2>/dev/null || true
-    fi
-    
-    # Create and push tag
-    git tag -a "$TAG_NAME" -m "Release $VERSION"
-    git push origin "$TAG_NAME"
-    
-    # Create GitHub release with zip file
-    gh release create "$TAG_NAME" \
-        --title "$RELEASE_TITLE" \
-        --notes "$RELEASE_NOTES" \
-        "$ZIP_FILE"
-    
-    if [ $? -eq 0 ]; then
-        echo "Successfully published release $TAG_NAME to GitHub!"
-        echo "Release URL: $(gh release view $TAG_NAME --web --json url -q .url 2>/dev/null || echo 'Check GitHub releases page')"
-    else
-        echo "Failed to publish release to GitHub."
-        exit 1
-    fi
-fi
+- Move AIPop.app to Applications folder"""
+
+		if run(f"git rev-parse {tag}") is not None:
+			log(f"Tag {tag} exists, deleting")
+			run(f"git tag -d {tag}")
+			run(f"git push origin --delete {tag}")
+			run(f"gh release delete {tag} --yes")
+
+		run(f"git tag -a {tag} -m 'Release {ver}'")
+		run(f"git push origin {tag}")
+
+		result = subprocess.run(
+			["gh", "release", "create", tag, "--title", title, "--notes", notes, zipFile],
+			capture_output=not verbose
+		)
+
+		if result.returncode != 0:
+			err("Publish failed")
+
+		print(f"Published {tag} to GitHub")
+
+if __name__ == "__main__":
+	try:
+		main()
+	except KeyboardInterrupt:
+		print("\nInterrupted")
+		sys.exit(1)

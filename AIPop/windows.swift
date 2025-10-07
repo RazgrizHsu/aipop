@@ -58,13 +58,15 @@ class DragImgView: NSImageView
 
 		if let mwin = self.window, let pop = wpop
 		{
+			let pf = pop.frame
 			let mf = mwin.frame
-			let nX = mf.origin.x + deltaX
-			let nY = mf.origin.y - deltaY
+			let nPopX = pf.origin.x + deltaX
+			let nPopY = pf.origin.y - deltaY
+			let nMovTop = (pf.maxY - deltaY) - 3.8 + mf.height
 
 			let scr = NSScreen.main!.visibleFrame
-			if nX >= scr.minX,      nX + mf.width <= scr.maxX,
-			   nY >= scr.minY + 10, nY + mf.height <= scr.maxY
+			if nPopX >= scr.minX,         nPopX + pf.width <= scr.maxX,
+			   nPopY >= scr.minY + 10,    nMovTop <= scr.maxY
 			{
 				pop.changePosition( NSPoint(x:deltaX,y:deltaY) )
 			}
@@ -87,6 +89,8 @@ class baseWin : NSWindow {
 
 
 class winBtns: baseWin {
+
+	private var vwHost: NSHostingView<SiteBtnsView>?
 
 	init() {
 
@@ -123,9 +127,28 @@ class winBtns: baseWin {
 		NSLayoutConstraint.activate([
 			vwHost.centerXAnchor.constraint(equalTo: vwCon.centerXAnchor),
 			vwHost.centerYAnchor.constraint(equalTo: vwCon.centerYAnchor),
-			vwHost.widthAnchor.constraint(equalTo: vwCon.widthAnchor, constant: -padding),
-			vwHost.heightAnchor.constraint(equalTo: vwCon.heightAnchor, constant: -padding)
 		])
+
+		self.vwHost = vwHost
+
+		updateSize()
+	}
+
+	func updateSize()
+	{
+		guard let vw = vwHost else { return }
+
+		let padding = 3.0
+		let hoCtr = NSHostingController(rootView: SiteBtnsView())
+		hoCtr.view.setFrameSize(NSSize(width: 1, height: 1))
+		let size = hoCtr.sizeThatFits(in: NSSize(width: CGFloat.greatestFiniteMagnitude, height: CGFloat.greatestFiniteMagnitude))
+
+		let newSize = NSSize(width: size.width + padding, height: size.height + padding)
+		self.setContentSize(newSize)
+
+		vw.setFrameSize(NSSize(width: size.width, height: size.height))
+
+		MBC.shared.wpop?.resetRefPos()
 	}
 }
 
@@ -285,8 +308,12 @@ class winPop: NSWindow, NSWindowDelegate
 	{
 		let fr = self.frame
 
+		guard let scr = NSScreen.screens.first(where: { $0.frame.intersects(fr) }) ?? NSScreen.main,
+			  let scrIdx = NSScreen.screens.firstIndex(of: scr) else { return }
+
 		var dic = Defaults[.dicPopFrame]
-		dic[MBC.monId] = fr
+		log( "[wpop:resetRefPos] save to screen[\(scrIdx)]: \(fr)" )
+		dic[scrIdx] = fr
 		Defaults[.dicPopFrame] = dic
 
 		for win in wins {
@@ -298,7 +325,7 @@ class winPop: NSWindow, NSWindowDelegate
 	{
 		super.setFrameOrigin( point )
 
-		log( "[wpop:setFrameOrigin] \(point) monx[\(MBC.monId)]" )
+		log( "[wpop:setFrameOrigin] \(point)" )
 		resetRefPos()
 		saveNowPos()
 	}
@@ -309,19 +336,17 @@ class winPop: NSWindow, NSWindowDelegate
 	}
 
 
-	private var lastMonId: Int = 0
-	var isMonChange : Bool { get { return lastMonId != MBC.monId } }
-
 	let debSavePos = Debouncer( delay: 0.3 )
 	func saveNowPos()
 	{
 		debSavePos.debounce {
+			let fr = self.frame
+			guard let scr = NSScreen.screens.first(where: { $0.frame.intersects(fr) }) ?? NSScreen.main,
+				  let scrIdx = NSScreen.screens.firstIndex(of: scr) else { return }
 
-			let monX = MBC.monId
 			var dic = Defaults[.dicPopFrame]
-
-			log( "[wpop] save: monX[\(monX)] new: \( self.frame )" )
-			dic[monX] = self.frame
+			log( "[wpop:saveNowPos] save to screen[\(scrIdx)]: \(fr)" )
+			dic[scrIdx] = fr
 			Defaults[.dicPopFrame] = dic
 		}
 	}
@@ -329,14 +354,35 @@ class winPop: NSWindow, NSWindowDelegate
 
 	func resetPositions( _ isReset: Bool = false )
 	{
-		guard let btn = MBC.shared.statusItem?.button else { return }
-		guard let btnFm = btn.window?.convertToScreen( btn.frame ) else { return }
+		var scr: NSScreen
+		var scrIdx: Int
+		var btnFm: NSRect
 
+		if let btn = MBC.shared.statusItem?.button, let bf = btn.window?.convertToScreen( btn.frame ) {
+			log("[wpop:resetPositions] status item at: \(bf.origin)")
 
-		//let isFirst = winPop.last == NSRect.zero
+			if let foundScr = NSScreen.screens.first(where: { $0.frame.contains(bf.origin) }),
+			   let foundIdx = NSScreen.screens.firstIndex(of: foundScr) {
+				scr = foundScr
+				scrIdx = foundIdx
+				btnFm = bf
+				log("[wpop:resetPositions] using status item screen[\(scrIdx)]")
+			} else {
+				scr = NSScreen.main ?? NSScreen.screens[0]
+				guard let idx = NSScreen.screens.firstIndex(of: scr) else { return }
+				scrIdx = idx
+				btnFm = NSRect(x: scr.frame.midX, y: scr.frame.maxY, width: 20, height: 20)
+				log("[wpop:resetPositions] status item not on any screen, using main screen[\(scrIdx)]")
+			}
+		} else {
+			scr = NSScreen.main ?? NSScreen.screens[0]
+			guard let idx = NSScreen.screens.firstIndex(of: scr) else { return }
+			scrIdx = idx
+			btnFm = NSRect(x: scr.frame.midX, y: scr.frame.maxY, width: 20, height: 20)
+			log("[wpop:resetPositions] no status item, using main screen[\(scrIdx)]")
+		}
 
 		let po = self.frame
-
 
 		var dic = Defaults[.dicPopFrame]
 		if isReset {
@@ -344,40 +390,41 @@ class winPop: NSWindow, NSWindowDelegate
 			Defaults[.dicPopFrame] = dic
 		}
 
-		let isMonCh = lastMonId != MBC.monId
-
-		lastMonId = MBC.monId
+		let movOffset = NSPoint( x: 12, y: -3.8 )
+		let movWidth = 37.0
 
 		let monX = btnFm.origin.x + (btnFm.width / 2)
-		let npt = NSPoint(x: monX - ( po.width / 2), y: ( btnFm.origin.y - po.height ) - 25 )
+		let movCenterX = movOffset.x + (movWidth / 2)
+		let npt = NSPoint(x: monX - movCenterX, y: ( btnFm.origin.y - iApp.initSize.height ) - 25 )
 
-		log( "[wpop] monId[\(lastMonId)] isReset[ \(isReset) ] isMonCh[ \(isMonCh) ] npt: \(npt)" )
+		log( "[wpop] monId[\(scrIdx)] npt: \(npt)" )
 
-		if var ofm = dic[lastMonId] {
+		if let ofm = dic[scrIdx], !isReset {
+			let isValid = ofm.origin.x >= scr.frame.minX &&
+						  ofm.origin.x + ofm.width <= scr.frame.maxX &&
+						  ofm.origin.y >= scr.frame.minY &&
+						  ofm.size.width > 100 && ofm.size.height > 100
 
-			if( ofm.origin.y > npt.y ) { ofm.origin.y = npt.y }
-
-			log( "[wpop] pos: exist ofm: \( ofm )" )
-			if( ofm.size.width > 100 && ofm.size.height > 100 ) {
+			if isValid {
+				log("[wpop:resetPositions] use saved position: \(ofm)")
 				self.setContentSize( ofm.size )
 				self.setFrameOrigin( ofm.origin )
 			}
 			else {
-				log( "[wpop] set new by iApp[\(iApp.initSize)]" )
+				log("[wpop:resetPositions] *** RESET TO DEFAULT *** saved[\(ofm)] invalid, use npt[\(npt)]")
 				self.setContentSize( iApp.initSize )
-				self.setFrameOrigin( ofm.origin )
+				self.setFrameOrigin( npt )
 
-				dic[lastMonId] = self.frame
+				dic[scrIdx] = self.frame
 				Defaults[.dicPopFrame] = dic
 			}
 		}
 		else {
-
-			log( "[wpop] pos: new npt: \( npt )" )
-			self.setFrameOrigin( npt )
+			log("[wpop:resetPositions] *** RESET TO DEFAULT *** no saved position or forced reset")
 			self.setContentSize( iApp.initSize )
+			self.setFrameOrigin( npt )
 
-			dic[MBC.monId] = self.frame
+			dic[scrIdx] = self.frame
 			Defaults[.dicPopFrame] = dic
 		}
 

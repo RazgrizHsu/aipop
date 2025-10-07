@@ -54,26 +54,12 @@ class MBC
 	var wpop: winPop?
 	var warr: winImage?
 	private var wmov: winImage?
-	private var wbtn: winBtns?
+	var wbtn: winBtns?
 
 	var statusItem: NSStatusItem?
 	var menu = NSMenu()
 
 	private var previousApp: NSRunningApplication?
-
-	public static var monId : Int
-	{
-		get
-		{
-			guard let scr = NSScreen.main,
-				  let idx = NSScreen.screens.firstIndex(of: scr) else {
-				return 0
-			}
-
-			return idx
-		}
-	}
-
 
 	init()
 	{
@@ -188,7 +174,7 @@ class MBC
 			}
 			else
 			{
-				if( pop.isMonChange ) { pop.resetPositions() }
+				pop.resetPositions()
 
 				NSApp.activate(ignoringOtherApps: true)
 				warr?.orderFront(nil)

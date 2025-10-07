@@ -26,7 +26,6 @@
 		75D334C32C6004E20074C2A3 /* SiteBtnsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 75D334C22C6004E20074C2A3 /* SiteBtnsView.swift */; };
 		75DE712D2C048D390095F0D0 /* winPop.swift in Sources */ = {isa = PBXBuildFile; fileRef = 75DE712C2C048D390095F0D0 /* winPop.swift */; };
 		75F052CF2E85433800518F27 /* shortcut.swift in Sources */ = {isa = PBXBuildFile; fileRef = 75F052CE2E85433800518F27 /* shortcut.swift */; };
-		C57241EA2B67CF5900703101 /* AIPopTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C57241E92B67CF5900703101 /* AIPopTests.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -47,7 +46,6 @@
 		C5091C802B5C4D8B0091896F /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		C53410792B8F3B0E007C55EA /* @Defaults.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "@Defaults.swift"; sourceTree = "<group>"; };
 		C57241E72B67CF5900703101 /* AIPopTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = AIPopTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
-		C57241E92B67CF5900703101 /* AIPopTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AIPopTests.swift; sourceTree = "<group>"; };
 		C57800932B7C7BF900B40EEC /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		C5A5BC992B626EEC00104D06 /* Functions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Functions.swift; sourceTree = "<group>"; };
 		C5C5F0242B8EDCAB00903601 /* @Settings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "@Settings.swift"; sourceTree = "<group>"; };
@@ -130,7 +128,6 @@
 		C57241E82B67CF5900703101 /* AIPopTests */ = {
 			isa = PBXGroup;
 			children = (
-				C57241E92B67CF5900703101 /* AIPopTests.swift */,
 			);
 			path = AIPopTests;
 			sourceTree = "<group>";
@@ -296,7 +293,6 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				C57241EA2B67CF5900703101 /* AIPopTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -312,7 +308,7 @@
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 56;
+				CURRENT_PROJECT_VERSION = 72;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_ASSET_PATHS = "";
 				DEVELOPMENT_TEAM = KT5ZZ9Q8DJ;
@@ -348,7 +344,7 @@
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
-				CURRENT_PROJECT_VERSION = 56;
+				CURRENT_PROJECT_VERSION = 72;
 				DEAD_CODE_STRIPPING = YES;
 				DEVELOPMENT_ASSET_PATHS = "";
 				DEVELOPMENT_TEAM = KT5ZZ9Q8DJ;
@@ -382,7 +378,7 @@
 				DEAD_CODE_STRIPPING = YES;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_OPTIMIZATION_LEVEL = 0;
-				MACOSX_DEPLOYMENT_TARGET = 13.0;
+				MACOSX_DEPLOYMENT_TARGET = 13.5;
 				PRODUCT_NAME = AIPopTests;
 			};
 			name = Debug;
@@ -393,7 +389,7 @@
 				COPY_PHASE_STRIP = YES;
 				DEAD_CODE_STRIPPING = YES;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
-				MACOSX_DEPLOYMENT_TARGET = 13.0;
+				MACOSX_DEPLOYMENT_TARGET = 13.5;
 				PRODUCT_NAME = AIPopTests;
 			};
 			name = Release;
