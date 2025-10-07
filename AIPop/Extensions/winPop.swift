@@ -2,8 +2,9 @@
 import Cocoa
 import WebKit
 import Defaults
+import UniformTypeIdentifiers
 
-extension winPop : WKNavigationDelegate, WKUIDelegate
+extension winPop : WKNavigationDelegate, WKUIDelegate, WKDownloadDelegate
 {
 	func webView(_ webView: WKWebView, decidePolicyFor navigationAction: WKNavigationAction, decisionHandler: @escaping (WKNavigationActionPolicy) -> Void)
 	{
@@ -14,6 +15,14 @@ extension winPop : WKNavigationDelegate, WKUIDelegate
 			{
 				log("[WebView] Special URL scheme detected: \(url.absoluteString)")
 				decisionHandler(.allow)
+				return
+			}
+
+			// Blob URLs - use download delegate
+			if url.scheme == "blob"
+			{
+				log("[WebView] Blob URL detected, triggering download: \(url.absoluteString)")
+				decisionHandler(.download)
 				return
 			}
 
@@ -33,10 +42,10 @@ extension winPop : WKNavigationDelegate, WKUIDelegate
 			else if url.host != Defaults[.nowHost] && url.host != nil && url.scheme != "about"
 			{
 				log("[WebView] JS navigation detected to external URL: \(url)")
-				
+
 				// NSWorkspace.shared.open(url)
 				// decisionHandler(.cancel)
-				
+
 				// ex: claude will open www.claudeusercontent.com
 				decisionHandler(.allow)
 				return
@@ -136,5 +145,69 @@ extension winPop : WKNavigationDelegate, WKUIDelegate
 	{
 		log("[WebView] JavaScript prompt: \(prompt)")
 		completionHandler(defaultText)
+	}
+
+	// WKDownloadDelegate methods
+	func webView(_ webView: WKWebView, navigationAction: WKNavigationAction, didBecome download: WKDownload)
+	{
+		log("[WebView] Download started")
+		download.delegate = self
+	}
+
+	func webView(_ webView: WKWebView, navigationResponse: WKNavigationResponse, didBecome download: WKDownload)
+	{
+		log("[WebView] Download started from response")
+		download.delegate = self
+	}
+
+	func download(_ download: WKDownload, decideDestinationUsing response: URLResponse, suggestedFilename: String, completionHandler: @escaping (URL?) -> Void)
+	{
+		log("[WebView] Download suggested filename: \(suggestedFilename), mimeType: \(response.mimeType ?? "unknown")")
+
+		var filename = suggestedFilename
+
+		// Add extension if missing
+		if (filename as NSString).pathExtension.isEmpty {
+			if let mimeType = response.mimeType {
+				var ext = ""
+				switch mimeType {
+				case "text/plain": ext = "txt"
+				case "text/html": ext = "html"
+				case "application/pdf": ext = "pdf"
+				case "application/zip": ext = "zip"
+				case "image/png": ext = "png"
+				case "image/jpeg", "image/jpg": ext = "jpg"
+				case "application/json": ext = "json"
+				default:
+					if let uti = UTType(mimeType: mimeType) {
+						ext = uti.preferredFilenameExtension ?? ""
+					}
+				}
+				if !ext.isEmpty {
+					filename = filename + "." + ext
+				}
+			}
+		}
+
+		let panel = NSSavePanel()
+		panel.nameFieldStringValue = filename
+
+		panel.begin { result in
+			if result == .OK {
+				completionHandler(panel.url)
+			} else {
+				completionHandler(nil)
+			}
+		}
+	}
+
+	func downloadDidFinish(_ download: WKDownload)
+	{
+		log("[WebView] Download finished")
+	}
+
+	func download(_ download: WKDownload, didFailWithError error: Error, resumeData: Data?)
+	{
+		log("[WebView] Download failed: \(error.localizedDescription)")
 	}
 }

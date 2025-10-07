@@ -11,7 +11,7 @@ struct SvcAi: Codable, Defaults.Serializable {
 extension Defaults.Keys {
 
 	static let aiServices = Key<[SvcAi]>("aiServices", default: [
-		SvcAi(host: "claude.ai", name: "Claude.Ai", ico: "arrow.up.and.down.circle"),
+		SvcAi(host: "claude.ai/new", name: "Claude.Ai", ico: "arrow.up.and.down.circle"),
 		SvcAi(host: "chatgpt.com", name: "ChatGPT.com", ico: "arrow.down.right.circle"),
 		SvcAi(host: "gemini.google.com/app", name: "Gemini", ico: "arrow.up.and.down.circle"),
 
