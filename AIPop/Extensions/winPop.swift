@@ -8,6 +8,60 @@ fileprivate let dbg = false
 
 extension winPop : WKNavigationDelegate, WKUIDelegate, WKDownloadDelegate
 {
+	func webView(_ webView: WKWebView, didStartProvisionalNavigation navigation: WKNavigation!)
+	{
+		if dbg { log("[WebView] Start loading: \(webView.url?.absoluteString ?? "")") }
+
+		if let host = webView.url?.host {
+			Task { @MainActor in
+				let svcs = Defaults[.aiServices]
+				let nm = svcs.first(where: { $0.host == host })?.name ?? host
+				if let wp = self as? winPop {
+					Notifier.shared.show( "Loading \(nm)...", duration: 0, refWin: wp )
+				}
+			}
+		}
+	}
+
+	func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!)
+	{
+		if dbg { log("[WebView] Loaded: \(webView.url?.absoluteString ?? "")") }
+
+		if let wp = self as? winPop {
+			wp.hideLoadingView()
+
+			if let host = webView.url?.host {
+				Task { @MainActor in
+					let svcs = Defaults[.aiServices]
+					let nm = svcs.first(where: { $0.host == host })?.name ?? host
+					Notifier.shared.show( "\(nm) loaded", refWin: wp )
+				}
+			}
+		}
+	}
+
+	func webView(_ webView: WKWebView, didFail navigation: WKNavigation!, withError error: Error)
+	{
+		if dbg { log("[WebView] Failed: \(error.localizedDescription)") }
+		if let wp = self as? winPop {
+			wp.hideLoadingView()
+			Task { @MainActor in
+				Notifier.shared.show( "Load failed: \(error.localizedDescription)", refWin: wp )
+			}
+		}
+	}
+
+	func webView(_ webView: WKWebView, didFailProvisionalNavigation navigation: WKNavigation!, withError error: Error)
+	{
+		if dbg { log("[WebView] Failed provisional: \(error.localizedDescription)") }
+		if let wp = self as? winPop {
+			wp.hideLoadingView()
+			Task { @MainActor in
+				Notifier.shared.show( "Connection failed: \(error.localizedDescription)", refWin: wp )
+			}
+		}
+	}
+
 	func webView(_ webView: WKWebView, decidePolicyFor navigationAction: WKNavigationAction, decisionHandler: @escaping (WKNavigationActionPolicy) -> Void)
 	{
 		if let url = navigationAction.request.url

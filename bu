@@ -114,8 +114,8 @@ def main():
 
 	result = subprocess.run(cmd, capture_output=not verbose, text=True)
 	if result.returncode != 0:
-		if not verbose:
-			print(result.stderr)
+		if not verbose and result.stdout:
+			print(result.stdout)
 		err("Build failed")
 
 	log(result.stdout)

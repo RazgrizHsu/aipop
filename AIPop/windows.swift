@@ -216,6 +216,7 @@ class winPop: NSWindow, NSWindowDelegate
 {
 	var webView: WKWebView!
 	var startLocation: NSPoint = NSPoint()
+	var loadingView: NSHostingView<LoadingView>?
 
 	var wins: [baseWin] = []
 
@@ -260,13 +261,13 @@ class winPop: NSWindow, NSWindowDelegate
 		let wvc = WKWebViewConfiguration()
 		wvc.websiteDataStore = .default()
 
-		// Allow JavaScript to open new windows
 		wvc.preferences.javaScriptCanOpenWindowsAutomatically = true
 
 		webView = WKWebView(frame: .zero, configuration: wvc)
 		webView.translatesAutoresizingMaskIntoConstraints = false
 		webView.navigationDelegate = self
-		webView.uiDelegate = self  // Set UIDelegate to handle window.open() calls
+		webView.uiDelegate = self
+		webView.setValue(false, forKey: "drawsBackground")
 		self.contentView?.subviews.first?.addSubview(webView)
 
 		NSLayoutConstraint.activate([
@@ -276,10 +277,48 @@ class winPop: NSWindow, NSWindowDelegate
 			webView.trailingAnchor.constraint(equalTo: self.contentView!.trailingAnchor)
 		])
 
+		showLoadingView()
+
 		let host = "https://\( Defaults[.nowHost] )"
 
 		log( "[wpop:load] url[\(host)]" )
 		webView.load(URLRequest(url: URL(string: host)!))
+	}
+
+	func showLoadingView()
+	{
+		let svcs = Defaults[.aiServices]
+		let host = Defaults[.nowHost]
+		let nm = svcs.first(where: { $0.host == host })?.name ?? host
+
+		let vw = LoadingView( msg: "Loading \(nm)..." )
+		let hv = NSHostingView( rootView: vw )
+		hv.translatesAutoresizingMaskIntoConstraints = false
+
+		self.contentView?.subviews.first?.addSubview( hv )
+
+		NSLayoutConstraint.activate([
+			hv.centerXAnchor.constraint(equalTo: self.contentView!.centerXAnchor),
+			hv.centerYAnchor.constraint(equalTo: self.contentView!.centerYAnchor, constant: self.contentView!.bounds.height / 6)
+		])
+
+		loadingView = hv
+	}
+
+	func hideLoadingView()
+	{
+		guard let lv = loadingView else { return }
+
+		NSAnimationContext.runAnimationGroup(
+			{ ctx in
+				ctx.duration = 0.5
+				lv.animator().alphaValue = 0
+			},
+			completionHandler: {
+				lv.removeFromSuperview()
+				self.loadingView = nil
+			}
+		)
 	}
 
 	func windowDidBecomeKey(_ notification: Notification)
@@ -382,8 +421,6 @@ class winPop: NSWindow, NSWindowDelegate
 			log("[wpop:resetPositions] no status item, using main screen[\(scrIdx)]")
 		}
 
-		let po = self.frame
-
 		var dic = Defaults[.dicPopFrame]
 		if isReset {
 			dic = [:]
@@ -475,5 +512,17 @@ class winPop: NSWindow, NSWindowDelegate
 		//let fm = sender.frame
 		//if fm.maxY < winPop.last.maxY {}
 		return news
+	}
+}
+
+struct LoadingView: View
+{
+	let msg: String
+
+	var body: some View {
+		Text( msg )
+			.font( .system( size: 18, weight: .medium ) )
+			.foregroundColor( .white )
+			.padding( 20 )
 	}
 }

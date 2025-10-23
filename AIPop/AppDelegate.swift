@@ -134,6 +134,7 @@ class MBC
 		let targetHost = svcs[index].host
 		if Defaults[.nowHost] != targetHost {
 			Defaults[.nowHost] = targetHost
+			Notifier.shared.show( "switching: \(svcs[index].name)", refWin: wpop )
 			clicked_Reload()
 		}
 	}

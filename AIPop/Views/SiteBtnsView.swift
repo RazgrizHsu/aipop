@@ -61,6 +61,7 @@ struct SiteBtnsView: View {
 					{ svc in
 						Button(action: {
 							selected = svc.host
+							Notifier.shared.show( "switching: \(svc.name)", refWin: MBC.shared.wpop )
 							MBC.shared.clicked_Reload()
 						})
 						{
